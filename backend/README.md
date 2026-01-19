@@ -13,7 +13,7 @@ FastAPI backend for the Mobile Subscription Tracker application.
 ```bash
 # 1. Clone the repository
 git clone <your-repo-url>
-cd subscription-tracker-api
+cd subscription-tracker-api/backend
 
 # 2. Create virtual environment
 python -m venv venv
@@ -41,7 +41,7 @@ uvicorn app.main:app --reload
 
 ### Base URL
 ```
-http://localhost:8000/api/v1
+SOON
 ```
 
 ### Authentication
@@ -281,6 +281,62 @@ Authorization: Bearer <access_token>
 ```
 
 ---
+### Get Payment History by Category
+```http
+GET /api/v1/analytics/spending/category/{category}?period=month
+Authorization: Bearer <access_token>
+```
+
+**Response (200):**
+```json
+{
+    "category": "streaming",
+    "period": "month",
+    "start_date": "2025-01-01T00:00:00",
+    "end_date": "2025-01-31T23:59:59",
+    "total_amount": 29.48,
+    "payment_count": 2,
+    "payments": [
+        {
+            "subscription_id": 1,
+            "subscription_name": "Netflix",
+            "category": "streaming",
+            "amount": 15.49,
+            "currency": "USD",
+            "payment_date": "2025-01-15T00:00:00",
+            "logo_url": "..."
+        }
+    ]
+}
+```
+
+### Get Full Payment History
+```http
+GET /api/v1/analytics/history?period=month
+Authorization: Bearer <access_token>
+```
+
+**Response (200):**
+```json
+{
+    "period": "month",
+    "start_date": "2025-01-01T00:00:00",
+    "end_date": "2025-01-31T23:59:59",
+    "total_amount": 85.47,
+    "payment_count": 5,
+    "currency": "USD",
+    "payments": [
+        {
+            "subscription_id": 1,
+            "subscription_name": "Netflix",
+            "category": "streaming",
+            "amount": 15.49,
+            "payment_date": "2025-01-15T00:00:00",
+            ...
+        }
+    ]
+}
+```
 
 ### Get Subscriptions by Category
 ```http
