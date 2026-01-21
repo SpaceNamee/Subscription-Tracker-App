@@ -51,6 +51,17 @@ fun Navigation(){
             LoginScreen(
                 onNavigateToRegister = {
                     navController.popBackStack()
+                },
+                onNavigateToNewPassword = {
+                    navController.navigate("newpassword")
+                }
+            )
+        }
+
+        composable("newpassword") {
+            NewPasswordScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
                 }
             )
         }

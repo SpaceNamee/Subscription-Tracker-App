@@ -35,7 +35,8 @@ val TextGray = Color(0xFF6B7280)
 
 @Composable
 fun LoginScreen(viewModel: LoginViewModel = viewModel(),
-                onNavigateToRegister: () -> Unit) {
+                onNavigateToRegister: () -> Unit,
+                onNavigateToNewPassword: () -> Unit) {
 
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -152,7 +153,7 @@ fun LoginScreen(viewModel: LoginViewModel = viewModel(),
                 text = "Forgot your Password",
                 style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold),
                 color = Color.DarkGray,
-                modifier = Modifier.clickable { /* TODO: Handle click */ }
+                modifier = Modifier.clickable { onNavigateToNewPassword() }
             )
         }
 
@@ -182,11 +183,8 @@ fun LoginScreen(viewModel: LoginViewModel = viewModel(),
             border = BorderStroke(1.dp, Color.LightGray),
             colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.Black)
         ) {
-            // Note: You need a Google icon drawable in res/drawable for this to work perfectly.
-            // Icon(painter = painterResource(id = R.drawable.ic_google), contentDescription = null, tint = Color.Unspecified)
-            // Spacer(modifier = Modifier.width(8.dp))
 
-            // Temporary "G" text to represent the icon if you don't have the drawable yet
+
             Text("G", fontWeight = FontWeight.Bold, color = Color.Red, modifier = Modifier.padding(end = 8.dp))
 
             Text("Continue with Google", fontSize = 16.sp, color = Color.Gray)

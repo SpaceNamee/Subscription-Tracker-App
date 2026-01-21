@@ -41,6 +41,9 @@ fun RegisterScreen(
     var isPasswordVisible by remember { mutableStateOf(false) }
     var isRepeatVisible by remember { mutableStateOf(false) }
 
+    var showLocation by remember { mutableStateOf(false) }
+    var showSetLocation by remember { mutableStateOf(false) }
+
     val statusMessage by viewModel.registerState.collectAsState()
 
     Column(
@@ -117,7 +120,7 @@ fun RegisterScreen(
 
         // 6. Register Button
         Button(
-            onClick = { viewModel.performRegister(email, password, repeatPassword) },
+            onClick = { showLocation = true },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
@@ -153,6 +156,38 @@ fun RegisterScreen(
                 color = TextGray,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.clickable { onNavigateToLogin() }
+            )
+        }
+
+        if (showLocation) {
+            LocationPermission(
+                onDismiss = { showLocation = false },
+                onUseCurrentLocation = {
+                    showLocation = false
+                    // Register here
+                    viewModel.performRegister(email, password, repeatPassword)
+                },
+                onSetLocationClick = {
+                    // Close this dialog and open the manual entry one
+                    showLocation = false
+                    showSetLocation = true
+                }
+            )
+        }
+
+        if (showSetLocation) {
+            SetLocation(
+                onDismiss = { showSetLocation = false },
+                onBack = {
+                    // Go back to the previous dialog
+                    showSetLocation = false
+                    showLocation = true
+                },
+                onSaveLocation = { location ->
+                    showSetLocation = false
+                    // Register
+                    viewModel.performRegister(email, password, repeatPassword)
+                }
             )
         }
     }
