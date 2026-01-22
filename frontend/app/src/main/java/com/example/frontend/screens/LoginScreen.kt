@@ -192,30 +192,24 @@ fun LoginScreen(viewModel: LoginViewModel = viewModel(),
 
         // 7. Footer text
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            contentAlignment = Alignment.Center
-        ) {
+        Spacer(modifier = Modifier.height(40.dp))
 
-            val annotatedString = buildAnnotatedString {
-                append("Don't have an Account?\n ")
-                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = Color.Black)) {
-                    append("Register for FREE")
-                }
-            }
+        Text(
+            text = "Don't have an account? ",
+            color = Color.Black,
+            fontSize = 16.sp,
+            textAlign = TextAlign.Center
+        )
+        Text(
+            text = "Register for FREE",
+            fontWeight = FontWeight.Bold,
+            color = Color.Black,
+            fontSize = 17.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.clickable { onNavigateToRegister() }
+        )
 
-            Text(
-                text = annotatedString,
-                style = MaterialTheme.typography.bodyMedium,
-                color = TextGray,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.clickable { onNavigateToRegister() }
-            )
-        }
-
-        Spacer(modifier = Modifier.height(10.dp)) // Bottom padding
+        Spacer(modifier = Modifier.height(10.dp))
 
         if (showLocation) {
             LocationPermission(

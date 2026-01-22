@@ -5,15 +5,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.frontend.screens.*
 import com.example.frontend.ui.theme.FrontendTheme
 
 class MainActivity : ComponentActivity() {
@@ -22,9 +20,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             FrontendTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Navigation()
-                }
+                Navigation()
             }
         }
     }
@@ -62,6 +58,42 @@ fun Navigation(){
             NewPasswordScreen(
                 onNavigateBack = {
                     navController.popBackStack()
+                },
+                onNavigateToCode = {
+                    navController.navigate("code")
+                }
+            )
+        }
+
+        composable("code") {
+            CodeScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onNavigateToReset = {
+                    navController.navigate("passwordcreate")
+                }
+            )
+        }
+
+        composable("passwordcreate") {
+            PasswordCreate(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onNavigateToLogin = {
+                    navController.navigate("passwordchanged")
+                }
+            )
+        }
+
+        composable("passwordchanged") {
+            PasswordChanged(
+                onNavigateToLogin = {
+
+                    navController.navigate("login") {
+                        popUpTo("login") { inclusive = true }
+                    }
                 }
             )
         }

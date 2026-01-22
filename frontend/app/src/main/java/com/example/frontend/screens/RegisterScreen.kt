@@ -1,4 +1,4 @@
-package com.example.frontend
+package com.example.frontend.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -25,6 +25,11 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.frontend.LightGrayInput
+import com.example.frontend.LocationPermission
+import com.example.frontend.SetLocation
+import com.example.frontend.SlateBlue
+import com.example.frontend.TextGray
 import com.example.frontend.data.RegisterViewModel
 
 @Composable
@@ -70,7 +75,8 @@ fun RegisterScreen(
         Text(
             text = "Create an Account for FREE",
             style = MaterialTheme.typography.bodyMedium,
-            color = TextGray
+            color = TextGray,
+            fontSize = 20.sp
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -138,26 +144,21 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(16.dp))
         }
 
-        // 7. Footer (Pinned to bottom via weight if needed, or just at end of scroll)
-        Box(
-            modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            val annotatedString = buildAnnotatedString {
-                append("Already have an account? \n")
-                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = Color.Black)) {
-                    append("Login")
-                }
-            }
-
-            Text(
-                text = annotatedString,
-                style = MaterialTheme.typography.bodyMedium,
-                color = TextGray,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.clickable { onNavigateToLogin() }
-            )
-        }
+        // 7. Footer
+        Text(
+            text = "Already have an account? ",
+            color = Color.Black,
+            fontSize = 16.sp,
+            textAlign = TextAlign.Center
+        )
+        Text(
+            text = "Login",
+            fontWeight = FontWeight.Bold,
+            color = Color.Black,
+            fontSize = 17.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.clickable { onNavigateToLogin() }
+        )
 
         if (showLocation) {
             LocationPermission(

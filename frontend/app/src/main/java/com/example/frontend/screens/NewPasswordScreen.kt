@@ -1,4 +1,4 @@
-package com.example.frontend
+package com.example.frontend.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
@@ -14,10 +14,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.frontend.LightGrayInput
+import com.example.frontend.SlateBlue
+import com.example.frontend.TextGray
 
 @Composable
 fun NewPasswordScreen(
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateToCode: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
 
@@ -109,8 +113,7 @@ fun NewPasswordScreen(
             // 3. Submit Button
             Button(
                 onClick = {
-                    // TODO: Call API to reset password
-                    onNavigateBack() // For now, just go back
+                    onNavigateToCode()
                 },
                 modifier = Modifier
                     .fillMaxWidth()
