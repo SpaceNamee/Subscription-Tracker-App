@@ -32,13 +32,40 @@ import com.ims.activesubscriptionsapp.data.models.Subscription
 // --- COMPONENTES AUXILIARES ---
 @Composable
 fun SubscriptionIconCircle(sub: Subscription, size: Int, isSmall: Boolean = false) {
-    Box(modifier = Modifier.size(size.dp).clip(if (isSmall) RoundedCornerShape(12.dp) else CircleShape).background(if (sub.iconRes == null) sub.color else Color.White), contentAlignment = Alignment.Center) {
-        if (sub.name == "Custom" && !isSmall) {
-            Text("+", fontSize = (size / 2.5).sp, color = Color.Black)
-        } else if (sub.iconRes != null) {
-            Image(painter = painterResource(id = sub.iconRes), contentDescription = sub.name, modifier = Modifier.fillMaxSize().padding(if (isSmall) 4.dp else 12.dp), contentScale = ContentScale.Fit)
+    // Determina o conteúdo do texto: se for "Custom" e não tiver nome ainda, mostra "+".
+    // Caso contrário, mostra a primeira letra do nome.
+    val displayLetter = when {
+        sub.name == "Custom" && !isSmall -> "+"
+        sub.name.isNotEmpty() -> sub.name.take(1).uppercase()
+        else -> "?"
+    }
+
+    Box(
+        modifier = Modifier
+            .size(size.dp)
+            .clip(if (isSmall) RoundedCornerShape(12.dp) else CircleShape)
+            // Se não tem ícone, usa a cor da subscrição. Se tem ícone, fundo branco.
+            .background(if (sub.iconRes == null) sub.color else Color.White),
+        contentAlignment = Alignment.Center
+    ) {
+        if (sub.iconRes != null) {
+            // Caso tenha uma imagem (Netflix, Spotify, etc.)
+            Image(
+                painter = painterResource(id = sub.iconRes),
+                contentDescription = sub.name,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(if (isSmall) 4.dp else 12.dp),
+                contentScale = ContentScale.Fit
+            )
         } else {
-            Text(sub.name.take(1).uppercase(), color = Color.White, fontWeight = FontWeight.Bold, fontSize = (size/3).sp)
+            // Caso seja CUSTOM ou sem imagem: Mostra a Letra Inicial
+            Text(
+                text = displayLetter,
+                color = if (sub.name == "Custom" && !isSmall) Color.Black else Color.White,
+                fontWeight = FontWeight.Bold,
+                fontSize = (size / 2.5).sp // Aumentei um pouco para ser mais visível
+            )
         }
     }
 }

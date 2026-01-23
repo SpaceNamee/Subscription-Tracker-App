@@ -30,6 +30,7 @@ import com.ims.activesubscriptionsapp.ui.components.SetLocation
 @Composable
 fun RegisterScreen(
     viewModel: RegisterViewModel = viewModel(),
+    onRegisterSuccess: () -> Unit,
     onNavigateToLogin: () -> Unit
 ) {
 
