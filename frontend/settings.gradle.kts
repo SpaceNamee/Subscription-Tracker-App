@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "frontend"
+rootProject.name = "ActiveSubscriptionsApp"
 include(":app")
  
