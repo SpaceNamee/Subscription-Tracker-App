@@ -20,20 +20,30 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.frontend.*
+import com.example.frontend.data.PasswordResetViewModel
 
 @Composable
 fun PasswordCreate(
+    viewModel: PasswordResetViewModel,
     onNavigateBack: () -> Unit,
     onNavigateToLogin: () -> Unit
 ) {
     var newPassword by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
+    var passwordError by remember { mutableStateOf<String?>(null) }
 
     var isNewPasswordVisible by remember { mutableStateOf(false) }
     var isConfirmPasswordVisible by remember { mutableStateOf(false) }
 
+    LaunchedEffect(viewModel.navigateToLogin) {
+        if (viewModel.navigateToLogin) {
+            viewModel.navigateToLogin = false
+            onNavigateToLogin()
+        }
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
-        // Top Bar (Consistent with other screens)
+        // Top Bar
         Row(
             modifier = Modifier
                 .align(Alignment.TopStart)
@@ -156,11 +166,23 @@ fun PasswordCreate(
 
             Spacer(modifier = Modifier.height(40.dp))
 
+            if (viewModel.errorMessage != null || passwordError != null) {
+                Text(
+                    text = viewModel.errorMessage ?: passwordError ?: "",
+                    color = Color.Red,
+                    fontSize = 14.sp
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+            }
+
             // 4. Save Button
             Button(
                 onClick = {
-                    // TODO: Logic to update password in backend
-                    if (newPassword == confirmPassword && newPassword.isNotEmpty()) {
+                    if (newPassword != confirmPassword) {
+                        passwordError = "Passwords do not match."
+                    } else {
+                        passwordError = null
+                        viewModel.onResetPasswordClick(newPassword)
                         onNavigateToLogin()
                     }
                 },

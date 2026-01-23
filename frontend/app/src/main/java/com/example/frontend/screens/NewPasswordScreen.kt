@@ -17,13 +17,22 @@ import androidx.compose.ui.unit.sp
 import com.example.frontend.LightGrayInput
 import com.example.frontend.SlateBlue
 import com.example.frontend.TextGray
+import com.example.frontend.data.PasswordResetViewModel
 
 @Composable
 fun NewPasswordScreen(
+    viewModel: PasswordResetViewModel,
     onNavigateBack: () -> Unit,
     onNavigateToCode: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
+
+    LaunchedEffect(viewModel.navigateToVerify) {
+        if (viewModel.navigateToVerify) {
+            viewModel.navigateToVerify = false
+            onNavigateToCode()
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
 
@@ -73,7 +82,7 @@ fun NewPasswordScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Don't worry, we can restore it",
+                text = "Don't worry, we can restore it.",
                 style = MaterialTheme.typography.bodyMedium,
                 color = TextGray,
                 textAlign = TextAlign.Center,
@@ -92,8 +101,8 @@ fun NewPasswordScreen(
                 )
 
                 OutlinedTextField(
-                    value = email,
-                    onValueChange = { email = it },
+                    value = viewModel.email,
+                    onValueChange = { viewModel.email = it },
                     placeholder = { Text("Type email here", color = Color.Gray) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
@@ -113,7 +122,7 @@ fun NewPasswordScreen(
             // 3. Submit Button
             Button(
                 onClick = {
-                    onNavigateToCode()
+                    viewModel.onSendCodeClick()
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -121,7 +130,16 @@ fun NewPasswordScreen(
                 shape = RoundedCornerShape(12.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = SlateBlue)
             ) {
-                Text("Send Code to Email", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                if (viewModel.isLoading) {
+                    CircularProgressIndicator(color = Color.White)
+                } else {
+                    Text("Send Code to Email", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                }
+                //Text("Send Code to Email", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+            }
+
+            if (viewModel.errorMessage != null) {
+                Text(text = viewModel.errorMessage!!, color = Color.Red)
             }
 
             Spacer(modifier = Modifier.height(40.dp))

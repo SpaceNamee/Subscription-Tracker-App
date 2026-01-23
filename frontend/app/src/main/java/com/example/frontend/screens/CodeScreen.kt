@@ -23,13 +23,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.frontend.*
+import com.example.frontend.data.PasswordResetViewModel
+
 
 @Composable
 fun CodeScreen(
+    viewModel: PasswordResetViewModel,
     onNavigateBack: () -> Unit,
     onNavigateToReset: () -> Unit
 ) {
     var code by remember { mutableStateOf("") }
+
+    LaunchedEffect(viewModel.navigateToReset) {
+        if (viewModel.navigateToReset) {
+            viewModel.navigateToReset = false
+            onNavigateToReset()
+        }
+    }
 
         Box(modifier = Modifier.fillMaxSize()) {
             // Top Bar
@@ -97,8 +107,8 @@ fun CodeScreen(
 
                 // 3. 6-Digit Code Input
                 BasicTextField(
-                    value = code,
-                    onValueChange = { if (it.length <= 6) code = it },
+                    value = viewModel.code,
+                    onValueChange = { if (it.length <= 6) viewModel.code = it },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     decorationBox = {
                         Row(
@@ -107,8 +117,8 @@ fun CodeScreen(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             for (i in 0 until 6) {
-                                val char = if (i < code.length) code[i].toString() else ""
-                                val isFocused = code.length == i
+                                val char = if (i < viewModel.code.length) viewModel.code[i].toString() else ""
+                                val isFocused = viewModel.code.length == i
 
                                 Box(
                                     modifier = Modifier
@@ -147,16 +157,32 @@ fun CodeScreen(
 
                 Spacer(modifier = Modifier.height(40.dp))
 
+                if (viewModel.errorMessage != null) {
+                    Text(
+                        text = viewModel.errorMessage!!,
+                        color = Color.Red,
+                        fontSize = 14.sp
+                    )
+                    Spacer(modifier = Modifier.height(10.dp))
+                }
+
                 // 4. "Check the Code" Button
                 Button(
-                    onClick = { onNavigateToReset() },
+                    onClick = { viewModel.onVerifyCodeClick() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
                     shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = SlateBlue)
+                    colors = ButtonDefaults.buttonColors(containerColor = SlateBlue),
+                    enabled = !viewModel.isLoading
                 ) {
-                    Text("Check the Code", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                    if (viewModel.isLoading) {
+                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+                    } else {
+                        Text("Check the Code", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
+                    }
+
+                    //Text("Check the Code", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))

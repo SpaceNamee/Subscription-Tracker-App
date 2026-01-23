@@ -10,5 +10,14 @@ interface AuthApi {
 
     @POST("api/v1/auth/register")
     suspend fun register(@Body request: RegisterRequest): RegisterResponse
+
+    @POST("/auth/forgot-password")
+    suspend fun sendResetCode(@Body body: Map<String, String>): Response<Void>
+
+    @POST("/auth/verify-code")
+    suspend fun verifyResetCode(@Body body: Map<String, String>): Response<Void>
+
+    @POST("/auth/reset-password")
+    suspend fun resetPassword(@Body body: Map<String, String>): Response<Void>
 }
 
