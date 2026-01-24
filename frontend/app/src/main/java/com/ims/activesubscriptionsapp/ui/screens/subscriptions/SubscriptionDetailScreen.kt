@@ -1,7 +1,10 @@
 package com.ims.activesubscriptionsapp.ui.screens.subscriptions
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,22 +26,78 @@ import com.ims.activesubscriptionsapp.ui.components.EditableInputBlock
 import com.ims.activesubscriptionsapp.ui.components.PeriodSelector
 import com.ims.activesubscriptionsapp.ui.components.SubscriptionIconCircle
 import com.ims.activesubscriptionsapp.data.models.Subscription
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditSubscriptionDetailScreen(
     subscription: Subscription,
     onSave: (Subscription) -> Unit,
     onBack: () -> Unit
 ) {
-    // IMPORTANTE: O remember(subscription) garante que quando mudas de subscrição na fila,
-    // os estados internos (como o nome e preço) fazem reset para os valores do novo item.
+    // Verificação de segurança: Se o Android for inferior ao 8.0,
+    // precisamos de garantir que as funções java.time não quebram a app.
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        SubscriptionDetailContent(subscription, onSave, onBack)
+    } else {
+        // Fallback simples para versões muito antigas (API 23-25)
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text("Esta funcionalidade requer Android 8.0 ou superior.")
+        }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SubscriptionDetailContent(
+    subscription: Subscription,
+    onSave: (Subscription) -> Unit,
+    onBack: () -> Unit
+) {
+    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+
+    // Estados locais
     var name by remember(subscription) {
         mutableStateOf(if (subscription.name == "Custom") "" else subscription.name)
     }
     var price by remember(subscription) { mutableStateOf(subscription.price) }
     var period by remember(subscription) { mutableStateOf(subscription.period) }
     var category by remember(subscription) { mutableStateOf(subscription.category) }
-    var date by remember(subscription) { mutableStateOf(subscription.firstPaymentDate) }
+
+    // Estado para a Data (LocalDate)
+    var selectedDate by remember(subscription) { mutableStateOf(subscription.firstPaymentDate) }
+    var showDatePicker by remember { mutableStateOf(false) }
+
+    // Configuração do DatePicker
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = selectedDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
+    )
+
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let { millis ->
+                        selectedDate = Instant.ofEpochMilli(millis)
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDate()
+                    }
+                    showDatePicker = false
+                }) { Text("OK") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) { Text("Cancel") }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -66,9 +125,6 @@ fun EditSubscriptionDetailScreen(
 
         Spacer(modifier = Modifier.height(30.dp))
 
-        // --- Ícone Dinâmico ---
-        // Se name estiver vazio, mostramos "Custom" (que ativa o "+" no seu componente)
-        // Caso contrário, o componente mostrará a primeira letra do que o user digitar.
         SubscriptionIconCircle(
             sub = subscription.copy(name = if (name.isEmpty()) "Custom" else name),
             size = 80
@@ -76,7 +132,6 @@ fun EditSubscriptionDetailScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // --- Campo de Nome (Apenas para Custom) ---
         if (subscription.name == "Custom") {
             EditableInputBlock(
                 label = "Subscription Name",
@@ -94,7 +149,16 @@ fun EditSubscriptionDetailScreen(
         EditableInputBlock("Payment", price) { price = it }
         PeriodSelector(period) { period = it }
         CategorySelector(category) { category = it }
-        EditableInputBlock("Start Payment", date, hasArrow = true) { date = it }
+
+        // Campo de Data que abre o DatePicker
+        Box(modifier = Modifier.clickable { showDatePicker = true }) {
+            EditableInputBlock(
+                label = "Start Payment",
+                value = selectedDate.format(formatter),
+                hasArrow = true,
+                onValueChange = { /* Não editável via teclado */ }
+            )
+        }
 
         Spacer(modifier = Modifier.weight(1f))
 
@@ -104,7 +168,7 @@ fun EditSubscriptionDetailScreen(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             OutlinedButton(
-                onClick = { /* Lógica de gestão externa se necessária */ },
+                onClick = { /* Lógica de gestão externa */ },
                 modifier = Modifier.weight(1f).height(56.dp),
                 shape = RoundedCornerShape(12.dp),
                 border = BorderStroke(1.dp, Color(0xFF006064))
@@ -115,14 +179,12 @@ fun EditSubscriptionDetailScreen(
 
             Button(
                 onClick = {
-                    // Criamos a cópia final para salvar
-                    val finalName = if (name.isEmpty()) "Custom" else name
                     onSave(subscription.copy(
-                        name = finalName,
+                        name = if (name.isEmpty()) "Custom" else name,
                         price = price,
                         period = period,
                         category = category,
-                        firstPaymentDate = date
+                        firstPaymentDate = selectedDate
                     ))
                 },
                 modifier = Modifier.weight(1f).height(56.dp),

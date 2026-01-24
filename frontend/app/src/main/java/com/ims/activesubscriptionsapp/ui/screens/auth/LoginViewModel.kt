@@ -13,32 +13,21 @@ class LoginViewModel : ViewModel() {
     private val _loginState = MutableStateFlow<String>("")
     val loginState = _loginState.asStateFlow()
 
+    // NOVO: Função para limpar o estado ao fazer logout
+    fun resetState() {
+        _loginState.value = ""
+    }
+
     fun performLogin(email: String, pass: String) {
         viewModelScope.launch {
             _loginState.value = "Logging in..."
-
             try {
-                // --- MODO DE SIMULAÇÃO (Enquanto o backend do grupo não funciona) ---
-                delay(1500) // Simula espera de rede
-
+                delay(1500)
                 if (email.isNotEmpty() && pass.length >= 4) {
-                    // Forçamos o estado para "Success"
-                    _loginState.value = "Success"
-                    println("DEBUG: Login simulado com sucesso para $email")
-                } else {
-                    _loginState.value = "Error: Credenciais inválidas (Simulação)"
-                }
-
-                /* // COMENTADO: Código real para quando o colega corrigir o backend
-                val request = LoginRequest(email = email, password = pass)
-                val response = RetrofitClient.api.login(request)
-                if (response.isSuccessful) {
                     _loginState.value = "Success"
                 } else {
-                    _loginState.value = "Error: ${response.code()}"
+                    _loginState.value = "Error: Credenciais inválidas"
                 }
-                */
-
             } catch (e: Exception) {
                 _loginState.value = "Error: ${e.message}"
             }
