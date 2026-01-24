@@ -1,74 +1,90 @@
 package com.ims.activesubscriptionsapp.ui.screens.subscriptions
 import com.ims.activesubscriptionsapp.data.remote.SubscriptionRequest
+import com.ims.activesubscriptionsapp.data.remote.AuthApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ims.activesubscriptionsapp.data.models.SubscriptionResponse
+import com.ims.activesubscriptionsapp.data.models.SubscriptionListResponse
 import com.ims.activesubscriptionsapp.data.remote.RetrofitClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import android.util.Log
-import com.ims.activesubscriptionsapp.data.models.SubscriptionResponse
-import com.ims.activesubscriptionsapp.data.models.SubscriptionListResponse
-// --------------------
 
 class SubscriptionViewModel : ViewModel() {
 
-    // Lista que o ecrã (Compose) vai observar
     private val _subscriptions = MutableStateFlow<List<SubscriptionResponse>>(emptyList())
     val subscriptions = _subscriptions.asStateFlow()
 
-    // Estado de carregamento
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading = _isLoading.asStateFlow()
+    private val _stateMessage = MutableStateFlow<String>("")
+    val stateMessage = _stateMessage.asStateFlow()
 
-    // 1. FUNÇÃO PARA BUSCAR AS SUBS CRIADAS (O que faltava para aparecer após o login)
-    fun fetchSubscriptions() {
+    fun loadSubscriptions() {
         viewModelScope.launch {
-            _isLoading.value = true
             try {
                 val response = RetrofitClient.api.getSubscriptions()
-                if (response.isSuccessful) {
-                    // Atualiza a lista na UI com os dados reais do Python
-                    _subscriptions.value = response.body()?.subscriptions ?: emptyList()
-                    Log.d("API_TEST", "Dados carregados: ${_subscriptions.value.size} itens.")
+                if (response.isSuccessful && response.body() != null) {
+                    _subscriptions.value = response.body()!!.subscriptions
+                    _stateMessage.value = "Subscriptions loaded"
                 } else {
-                    Log.e("API_TEST", "Erro ao buscar: ${response.code()}")
+                    _stateMessage.value = "Failed to load subscriptions"
                 }
             } catch (e: Exception) {
-                Log.e("API_TEST", "Falha de rede ao listar: ${e.message}")
-            } finally {
-                _isLoading.value = false
+                _stateMessage.value = "Error: ${e.message}"
             }
         }
     }
 
-    // 2. FUNÇÃO PARA CRIAR (Atualizada para limpar a UI após sucesso)
-    fun createSubscription() {
-        val request = SubscriptionRequest(
-            name = "Netflix",
-            description = "Plano 4K",
-            category = "streaming",
-            amount = 15.99,
-            currency = "EUR",
-            paymentPeriod = "monthly",
-            firstPaymentDate = "2026-01-24T12:00:00",
-            websiteUrl = "https://netflix.com",
-            logoUrl = null
-        )
-
+    fun addSubscription(request: SubscriptionRequest) {
         viewModelScope.launch {
             try {
                 val response = RetrofitClient.api.createSubscription(request)
-                if (response.isSuccessful) {
-                    Log.d("API_TEST", "Subscrição criada com sucesso!")
-                    // MUITO IMPORTANTE: Após criar, mandamos buscar a lista atualizada
-                    fetchSubscriptions()
+                if (response.isSuccessful && response.body() != null) {
+                    _subscriptions.value = _subscriptions.value + response.body()!!
+                    _stateMessage.value = "Subscription added"
                 } else {
-                    Log.e("API_TEST", "Erro ao criar: ${response.code()} - ${response.errorBody()?.string()}")
+                    _stateMessage.value = "Failed to add subscription"
                 }
             } catch (e: Exception) {
-                Log.e("API_TEST", "Falha catastrófica ao criar: ${e.message}")
+                _stateMessage.value = "Error: ${e.message}"
             }
         }
+    }
+
+    fun updateSubscription(id: Int, request: SubscriptionRequest) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitClient.api.updateSubscription(id, request)
+                if (response.isSuccessful && response.body() != null) {
+                    _subscriptions.value = _subscriptions.value.map {
+                        if (it.id == id) response.body()!! else it
+                    }
+                    _stateMessage.value = "Subscription updated"
+                } else {
+                    _stateMessage.value = "Failed to update subscription"
+                }
+            } catch (e: Exception) {
+                _stateMessage.value = "Error: ${e.message}"
+            }
+        }
+    }
+
+    fun deleteSubscription(id: Int) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitClient.api.deleteSubscription(id)
+                if (response.isSuccessful) {
+                    _subscriptions.value = _subscriptions.value.filter { it.id != id }
+                    _stateMessage.value = "Subscription deleted"
+                } else {
+                    _stateMessage.value = "Failed to delete subscription"
+                }
+            } catch (e: Exception) {
+                _stateMessage.value = "Error: ${e.message}"
+            }
+        }
+    }
+
+    fun clearSubscriptions() {
+        _subscriptions.value = emptyList()
     }
 }

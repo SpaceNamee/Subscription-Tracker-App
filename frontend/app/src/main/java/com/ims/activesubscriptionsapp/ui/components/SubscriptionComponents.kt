@@ -65,7 +65,7 @@ fun SubscriptionIconCircle(sub: SubscriptionResponse, size: Int, isSmall: Boolea
                     painter = painterResource(id = logo),
                     contentDescription = sub.name,
                     tint = Color.Unspecified,
-                    modifier = Modifier.size((size * 0.5).dp)
+                    modifier = Modifier.size((size * 1.0).dp)
                 )
             } else {
                 // Fallback: primeira letra

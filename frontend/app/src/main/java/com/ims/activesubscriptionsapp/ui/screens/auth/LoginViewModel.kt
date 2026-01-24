@@ -4,11 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ims.activesubscriptionsapp.data.models.LoginRequest
 import com.ims.activesubscriptionsapp.data.remote.RetrofitClient
+import com.ims.activesubscriptionsapp.ui.screens.subscriptions.SubscriptionViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class LoginViewModel : ViewModel() {
+
     private val _loginState = MutableStateFlow<String>("")
     val loginState = _loginState.asStateFlow()
 
@@ -16,7 +18,7 @@ class LoginViewModel : ViewModel() {
         _loginState.value = ""
     }
 
-    fun performLogin(email: String, pass: String) {
+    fun performLogin(email: String, pass: String, onSuccess: () -> Unit, subscriptionViewModel: SubscriptionViewModel) {
         viewModelScope.launch {
             _loginState.value = "Logging in..."
             try {
@@ -24,11 +26,16 @@ class LoginViewModel : ViewModel() {
                 val response = RetrofitClient.api.login(request)
 
                 if (response.isSuccessful && response.body() != null) {
-                    // SUCESSO: Extraímos o token da resposta e guardamos no Client
                     val token = response.body()?.accessToken
                     RetrofitClient.authToken = token
 
+                    // Carregar subscrições do usuário
+                    subscriptionViewModel.loadSubscriptions()
+
                     _loginState.value = "Success"
+
+                    // Avisa MainActivity que login foi sucesso
+                    onSuccess()
                 } else {
                     val errorMsg = response.errorBody()?.string() ?: "Invalid Credentials"
                     _loginState.value = "Error: $errorMsg"
@@ -38,5 +45,11 @@ class LoginViewModel : ViewModel() {
                 e.printStackTrace()
             }
         }
+    }
+
+    fun logout(subscriptionViewModel: SubscriptionViewModel) {
+        RetrofitClient.authToken = null
+        subscriptionViewModel.clearSubscriptions()
+        _loginState.value = "" // Reset state
     }
 }

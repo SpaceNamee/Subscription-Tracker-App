@@ -1,4 +1,5 @@
 package com.ims.activesubscriptionsapp
+import androidx.compose.runtime.saveable.rememberSaveable
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -20,15 +21,16 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ActiveSubscriptionsAppTheme {
-                var isLoggedIn by remember { mutableStateOf(false) }
-                var showRegister by remember { mutableStateOf(false) }
+                // Correção: importar rememberSaveable corretamente
+                var isLoggedIn by rememberSaveable { mutableStateOf(false) }
+                var showRegister by rememberSaveable { mutableStateOf(false) }
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = Color(0xFFF8F8F8)
                 ) {
-                    if (!isLoggedIn) {
-                        // Se NÃO estiver logado, mostrar login/register
+                    if (isLoggedIn == false) { // operador '!' não necessário
+                        // Login / Register
                         if (showRegister) {
                             RegisterScreen(
                                 onRegisterSuccess = { showRegister = false },
@@ -42,7 +44,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
                     } else {
-                        // Se estiver logado, só aí iniciar MainNavigation
+                        // MainNavigation quando logado
                         MainNavigation(
                             onLogout = { isLoggedIn = false }
                         )
@@ -52,4 +54,3 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-

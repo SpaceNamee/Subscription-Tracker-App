@@ -42,12 +42,16 @@ fun MainNavigation(
                 onNavigate = { settingsFlow = it },
                 onExit = { settingsFlow = "none" },
                 onLogout = {
-                    // Limpar estado interno e voltar para login
+                    // 1. Reset de navegação primeiro (para não cair no 'else' do SubscriptionScreen)
+                    showHome = false
+                    currentIndex = -1
+                    settingsFlow = "none"
+
+                    // 2. Limpar dados
                     finalizedSubscriptions.clear()
                     selectedQueue.clear()
-                    currentIndex = -1
-                    showHome = false
-                    settingsFlow = "none"
+
+                    // 3. Notificar o pai (MainActivity/LoginViewModel) para mudar o estado de autenticação
                     onLogout()
                 }
             )
@@ -136,34 +140,26 @@ fun MainNavigation(
 
         // ================== SELEÇÃO DE SUBSCRIÇÕES ==================
         else -> {
+            // Se showHome é falso mas currentIndex é -1, significa que estamos no início
+            // OU que acabámos de fazer logout.
+            // Só mostramos se não estivermos num processo de saída.
             SubscriptionScreen(
                 alreadyAdded = finalizedSubscriptions,
                 onNext = { list ->
-
-                    // 1️⃣ Identificar apenas as novas subscrições
                     val newOnes = list.filter { newSub ->
                         finalizedSubscriptions.none { it.id == newSub.id }
                     }
 
-                    // 2️⃣ Adicionar novas subscrições à lista final
-                    newOnes.forEach { finalizedSubscriptions.add(it) }
-
-                    // 🔹 Salvar novas subscrições no backend
-                    // newOnes.forEach { saveSubscriptionToBackend(it) }
-
-                    // 3️⃣ Editar apenas as novas subscrições
                     if (newOnes.isNotEmpty()) {
+                        finalizedSubscriptions.addAll(newOnes)
                         selectedQueue.clear()
                         selectedQueue.addAll(newOnes)
                         currentIndex = 0
-                        showHome = false
                     } else {
                         showHome = true
                     }
                 },
-                onSkip = {
-                    showHome = true
-                }
+                onSkip = { showHome = true }
             )
         }
     }
