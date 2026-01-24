@@ -1,8 +1,7 @@
 from pydantic import BaseModel, Field, field_validator
 from typing import Optional, List
 from datetime import datetime, timezone
-from backend.app.models.subscription import PaymentPeriod, SubscriptionCategory
-
+from app.models.subscription import PaymentPeriod, SubscriptionCategory
 
 # ============== Request Schemas ==============
 
@@ -14,22 +13,26 @@ class SubscriptionCreate(BaseModel):
     amount: float = Field(..., gt=0)
     currency: str = Field(default="USD", min_length=3, max_length=3)
     payment_period: PaymentPeriod
-    first_payment_date: Optional[datetime] = None # first only mean in application context
+    first_payment_date: Optional[datetime] = None
 
     website_url: Optional[str] = None
     logo_url: Optional[str] = None
 
+    # O validador TEM de estar indentado aqui dentro
     @field_validator('first_payment_date')
     @classmethod
     def validate_first_payment_date(cls, v: Optional[datetime]) -> Optional[datetime]:
-        """Ensure next_payment_date is not in the past."""
+        """Ensure first_payment_date is not in the future."""
         if v is None:
             return v
-        now = datetime.now(v.tzinfo) if v.tzinfo else datetime.now(timezone.utc)
-        if v > now:
-            raise ValueError('Last payment date cannot be in the future.')
+        
+        # Converte para naive para comparação segura
+        v_utc = v.astimezone(timezone.utc).replace(tzinfo=None)
+        now_utc = datetime.now(timezone.utc).replace(tzinfo=None)
+        
+        if v_utc > now_utc:
+            raise ValueError('First payment date cannot be in the future.')
         return v
-
 
 class SubscriptionUpdate(BaseModel):
     """Schema for updating a subscription."""

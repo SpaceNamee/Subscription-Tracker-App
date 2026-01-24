@@ -34,6 +34,8 @@ class Settings(BaseSettings):
     # CORS - allowed origins for your Kotlin app
     CORS_ORIGINS: List[str] = ["*"]  # Restrict in production
     
+    TEMPLATE_FOLDER: Path = Path(__file__).parent.parent / "templates"
+
     class Config:
         env_file = ".env"
         case_sensitive = True

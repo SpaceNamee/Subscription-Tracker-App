@@ -5,17 +5,17 @@ from typing import List
 from datetime import datetime, timedelta, timezone
 from dateutil.relativedelta import relativedelta
 
-from backend.app.api.v1.endpoints.subscriptions import calculate_next_payment_date
-from backend.app.db.database import get_db
-from backend.app.models.subscription import Subscription, SubscriptionCategory, PaymentPeriod
-from backend.app.models.user import User
-from backend.app.schemas.analytics import (
+from app.api.v1.endpoints.subscriptions import calculate_next_payment_date
+from app.db.database import get_db
+from app.models.subscription import Subscription, SubscriptionCategory, PaymentPeriod
+from app.models.user import User
+from app.schemas.analytics import (
     SpendingAnalytics,
     CategorySpending,
     UpcomingPayment,
     UpcomingPaymentsResponse,
 )
-from backend.app.core.security import get_current_user_id
+from app.core.security import get_current_user_id
 
 router = APIRouter(prefix="/analytics", tags=["Analytics"])
 

@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from typing import List, Dict
 from datetime import datetime
-from backend.app.models.subscription import SubscriptionCategory
+from app.models.subscription import SubscriptionCategory
 
 
 class CategorySpending(BaseModel):

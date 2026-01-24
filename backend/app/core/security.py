@@ -5,7 +5,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import bcrypt
 
-from backend.app.core.config import settings
+from app.core.config import settings
 
 # JWT Bearer scheme
 security = HTTPBearer()

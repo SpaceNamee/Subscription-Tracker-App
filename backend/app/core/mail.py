@@ -1,6 +1,6 @@
 from dns.message import Message
 from fastapi_mail import FastMail, ConnectionConfig, MessageSchema, MessageType
-from backend.app.core.config import settings
+from app.core.config import settings
 from pathlib import Path
 from pydantic import EmailStr
 from typing import List

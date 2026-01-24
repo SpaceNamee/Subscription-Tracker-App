@@ -6,9 +6,9 @@ from typing import List, Optional
 from datetime import datetime, timedelta, timezone
 from dateutil.relativedelta import relativedelta
 
-from backend.app.db.database import get_db
-from backend.app.models.subscription import Subscription, PaymentPeriod, SubscriptionCategory
-from backend.app.schemas.subscription import (
+from app.db.database import get_db
+from app.models.subscription import Subscription, PaymentPeriod, SubscriptionCategory
+from app.schemas.subscription import (
     SubscriptionCreate,
     SubscriptionUpdate,
     SubscriptionResponse,
@@ -16,8 +16,8 @@ from backend.app.schemas.subscription import (
     PopularSubscription,
     POPULAR_SUBSCRIPTIONS,
 )
-from backend.app.schemas.user import MessageResponse
-from backend.app.core.security import get_current_user_id
+from app.schemas.user import MessageResponse
+from app.core.security import get_current_user_id
 
 router = APIRouter(prefix="/subscriptions", tags=["Subscriptions"])
 
@@ -68,20 +68,16 @@ async def get_categories():
 @router.post("", response_model=SubscriptionResponse, status_code=status.HTTP_201_CREATED)
 async def create_subscription(
     subscription_data: SubscriptionCreate,
-    user_id: int = Depends(get_current_user_id),
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    user_id: int = Depends(get_current_user_id)
 ):
-    """
-    Create a new subscription.
+    """Create a new subscription ignoring auth for testing."""
+    new_subscription = Subscription(
+        user_id=user_id,
+        # ... outros campos
+    )
     
-    - name: Subscription name (e.g., "Netflix")
-    - category: One of the predefined categories
-    - amount: Payment amount
-    - currency: 3-letter currency code (e.g., "USD")
-    - payment_period: weekly, monthly, quarterly, or yearly
-    - first_payment_date: Date of first payment
-    """
-    # Calculate next payment date
+    # O resto do código continua igual...
     next_payment = calculate_next_payment_date(
         subscription_data.first_payment_date,
         subscription_data.payment_period
@@ -104,9 +100,8 @@ async def create_subscription(
     await db.commit()
     await db.refresh(new_subscription)
 
-    result = new_subscription.__dict__
+    result = new_subscription.__dict__.copy()
     result["next_payment_date"] = next_payment
-
 
     return SubscriptionResponse(**result)
 
@@ -118,6 +113,7 @@ async def get_subscriptions(
     user_id: int = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_db)
 ):
+    Depends(get_current_user_id)
     """
     Get all subscriptions for the current user.
     

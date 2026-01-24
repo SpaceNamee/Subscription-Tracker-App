@@ -2,10 +2,10 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-from backend.app.db.database import get_db
-from backend.app.models.user import User
-from backend.app.schemas.mail import EmailModel
-from backend.app.schemas.user import (
+from app.db.database import get_db
+from app.models.user import User
+from app.schemas.mail import EmailModel
+from app.schemas.user import (
     UserCreate,
     UserLogin,
     UserResponse,
@@ -14,7 +14,7 @@ from backend.app.schemas.user import (
     PasswordChange,
     EmailChange,
 )
-from backend.app.core.security import (
+from app.core.security import (
     get_password_hash,
     verify_password,
     create_access_token,
@@ -25,7 +25,7 @@ from backend.app.core.security import (
     get_current_user_id,
 )
 
-from backend.app.core.mail import create_message, mail
+from app.core.mail import create_message, mail
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 

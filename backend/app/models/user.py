@@ -2,14 +2,15 @@ from sqlalchemy import Column, Integer, String, Boolean, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
-from backend.app.db.database import Base
+from app.db.database import Base
 
 
 class User(Base):
     __tablename__ = "users"
+    __table_args__ = {'extend_existing': True}
     
-    id = Column(Integer, primary_key=True, index=True)
-    email = Column(String(255), unique=True, index=True, nullable=False)
+    id = Column(Integer, primary_key=True)
+    email = Column(String(255), nullable=False)
     hashed_password = Column(String(255), nullable=False)
     
     # Profile

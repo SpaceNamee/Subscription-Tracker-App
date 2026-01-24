@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 import enum
 
-from backend.app.db.database import Base
+from app.db.database import Base
 
 
 class PaymentPeriod(str, enum.Enum):
@@ -33,6 +33,7 @@ class SubscriptionCategory(str, enum.Enum):
 
 class Subscription(Base):
     __tablename__ = "subscriptions"
+    __table_args__ = {'extend_existing': True}
     
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
