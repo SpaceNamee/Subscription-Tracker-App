@@ -1,5 +1,5 @@
 package com.ims.activesubscriptionsapp.ui.screens.stats
-
+import com.ims.activesubscriptionsapp.data.models.SubscriptionResponse
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Canvas
@@ -36,7 +36,7 @@ val NeonColors = listOf(
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun StatisticsScreen(
-    subscriptions: List<Subscription>,
+    subscriptions: List<SubscriptionResponse>,
     onBack: () -> Unit,
     onNavigateToHome: () -> Unit,
     onCategoryClick: (String) -> Unit
@@ -44,7 +44,7 @@ fun StatisticsScreen(
     val categoryTotals = remember(subscriptions) {
         subscriptions.groupBy { it.category }
             .mapValues { entry ->
-                entry.value.sumOf { sub -> sub.price.toDoubleOrNull() ?: 0.0 }
+                entry.value.sumOf { sub -> sub.amount ?: 0.0 }
             }
     }
 

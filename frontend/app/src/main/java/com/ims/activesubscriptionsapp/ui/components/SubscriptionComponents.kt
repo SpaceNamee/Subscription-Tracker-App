@@ -1,8 +1,8 @@
 package com.ims.activesubscriptionsapp.ui.components
 
 import android.os.Build
+import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -18,60 +18,81 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ims.activesubscriptionsapp.data.models.Subscription
+import com.ims.activesubscriptionsapp.R
+import com.ims.activesubscriptionsapp.data.models.SubscriptionResponse
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
+// 🔹 Mapa de logotipos
+object SubscriptionLogos {
+    @DrawableRes
+    val logos = mapOf(
+        "YouTube" to R.drawable.ic_youtube,
+        "Spotify" to R.drawable.ic_spotify,
+        "Netflix" to R.drawable.ic_netflix,
+        "X.com" to R.drawable.ic_xcom,
+        "Roblox" to R.drawable.ic_roblox,
+        "Paramount+" to R.drawable.ic_paramount
+    )
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun SubscriptionIconCircle(sub: Subscription, size: Int, isSmall: Boolean = false) {
-    val displayLetter = when {
-        sub.name == "Custom" && !isSmall -> "+"
-        sub.name.isNotEmpty() -> sub.name.take(1).uppercase()
-        else -> "?"
-    }
-
+fun SubscriptionIconCircle(sub: SubscriptionResponse, size: Int, isSmall: Boolean = false) {
     Box(
         modifier = Modifier
             .size(size.dp)
             .clip(if (isSmall) RoundedCornerShape(12.dp) else CircleShape)
-            .background(if (sub.iconRes == null) sub.color else Color.White),
+            .background(Color(0xFF5387AC)),
         contentAlignment = Alignment.Center
     ) {
-        if (sub.iconRes != null) {
-            Image(
-                painter = painterResource(id = sub.iconRes),
-                contentDescription = sub.name,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(if (isSmall) 4.dp else 12.dp),
-                contentScale = ContentScale.Fit
-            )
-        } else {
+        if (sub.name == "Custom") {
+            // Apenas a primeira letra
             Text(
-                text = displayLetter,
-                color = if (sub.name == "Custom" && !isSmall) Color.Black else Color.White,
+                text = sub.name.first().uppercase(),
+                color = Color.White,
                 fontWeight = FontWeight.Bold,
                 fontSize = (size / 2.5).sp
             )
+        } else {
+            val logo: Int? = SubscriptionLogos.logos[sub.name] // tipagem explícita
+            if (logo != null) {
+                Icon(
+                    painter = painterResource(id = logo),
+                    contentDescription = sub.name,
+                    tint = Color.Unspecified,
+                    modifier = Modifier.size((size * 0.5).dp)
+                )
+            } else {
+                // Fallback: primeira letra
+                Text(
+                    text = sub.name.first().uppercase(),
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = (size / 2.5).sp
+                )
+            }
         }
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun SubscriptionRow(sub: Subscription, onClick: () -> Unit) {
-    // Pegamos no tempo restante calculado pela lógica do modelo
-    val timeRemaining = sub.getRemainingTime()
-
-    // Cor de alerta: Vermelho se for hoje ou amanhã, cinza para o resto
-    val statusColor = if (timeRemaining == "Today" || timeRemaining == "Tomorrow") {
-        Color.Red
-    } else {
-        Color.Gray
+fun SubscriptionRow(sub: SubscriptionResponse, onClick: () -> Unit) {
+    val nextDate = LocalDate.parse(sub.nextPaymentDate.split("T")[0])
+    val today = LocalDate.now()
+    val daysBetween = ChronoUnit.DAYS.between(today, nextDate)
+    val timeRemaining = when {
+        daysBetween == 0L -> "Today"
+        daysBetween == 1L -> "Tomorrow"
+        daysBetween < 0L -> "Overdue"
+        else -> "In $daysBetween days"
     }
+    val statusColor = if (daysBetween <= 1L) Color.Red else Color.Gray
 
     Row(
         modifier = Modifier
@@ -86,24 +107,19 @@ fun SubscriptionRow(sub: Subscription, onClick: () -> Unit) {
 
         Column(modifier = Modifier.padding(start = 16.dp).weight(1f)) {
             Text(sub.name, fontWeight = FontWeight.Bold)
-
-            // AGORA DINÂMICO: Usa o cálculo real do modelo
-            Text(
-                text = timeRemaining,
-                color = statusColor,
-                fontSize = 12.sp
-            )
+            Text(text = timeRemaining, color = statusColor, fontSize = 12.sp)
         }
 
         Column(horizontalAlignment = Alignment.End) {
-            Text("${sub.price}€", fontWeight = FontWeight.Bold)
+            Text("${"%.2f".format(sub.amount)}€", fontWeight = FontWeight.Bold)
             Text("Manage >", color = Color.Gray, fontSize = 12.sp)
         }
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun SubscriptionGridItem(sub: Subscription, isSelected: Boolean, onClick: () -> Unit) {
+fun SubscriptionGridItem(sub: SubscriptionResponse, isSelected: Boolean, onClick: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -123,7 +139,7 @@ fun SubscriptionGridItem(sub: Subscription, isSelected: Boolean, onClick: () -> 
             if (isSelected) {
                 Icon(
                     Icons.Default.CheckCircle,
-                    null,
+                    contentDescription = null,
                     tint = Color(0xFF5387AC),
                     modifier = Modifier
                         .size(24.dp)

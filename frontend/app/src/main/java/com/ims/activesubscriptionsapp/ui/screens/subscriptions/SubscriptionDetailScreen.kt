@@ -1,5 +1,5 @@
 package com.ims.activesubscriptionsapp.ui.screens.subscriptions
-
+import androidx.compose.material.icons.filled.ArrowDropDown
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
@@ -21,72 +21,72 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.ims.activesubscriptionsapp.ui.components.CategorySelector
-import com.ims.activesubscriptionsapp.ui.components.EditableInputBlock
-import com.ims.activesubscriptionsapp.ui.components.PeriodSelector
-import com.ims.activesubscriptionsapp.ui.components.SubscriptionIconCircle
-import com.ims.activesubscriptionsapp.data.models.Subscription
+import com.ims.activesubscriptionsapp.data.models.SubscriptionResponse
+import com.ims.activesubscriptionsapp.ui.components.*
 import java.time.Instant
-import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-@RequiresApi(Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditSubscriptionDetailScreen(
-    subscription: Subscription,
-    onSave: (Subscription) -> Unit,
-    onBack: () -> Unit
+fun EditableInputBlock(
+    label: String,
+    value: String,
+    onValueChange: (String) -> Unit,
+    hasArrow: Boolean = false,
+    enabled: Boolean = true // 1. Adiciona o parâmetro com valor padrão true
 ) {
-    // Verificação de segurança: Se o Android for inferior ao 8.0,
-    // precisamos de garantir que as funções java.time não quebram a app.
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        SubscriptionDetailContent(subscription, onSave, onBack)
-    } else {
-        // Fallback simples para versões muito antigas (API 23-25)
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("Esta funcionalidade requer Android 8.0 ou superior.")
-        }
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(text = label, color = Color.Gray, fontSize = 12.sp)
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            enabled = enabled, // 2. Passa o parâmetro para o TextField
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp),
+// No trailingIcon do OutlinedTextField
+            trailingIcon = if (hasArrow) {
+                { Icon(Icons.Default.ArrowDropDown, null) } // ArrowDropDown costuma estar sempre disponível
+            } else null
+            // ... outros estilos que já tenhas (colors, textStyle, etc.)
+        )
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @OptIn(ExperimentalMaterial3Api::class)
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-private fun SubscriptionDetailContent(
-    subscription: Subscription,
-    onSave: (Subscription) -> Unit,
+fun EditSubscriptionDetailScreen(
+    subscription: SubscriptionResponse,
+    onSave: (SubscriptionResponse) -> Unit,
     onBack: () -> Unit
 ) {
-    val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-
-    // Estados locais
+    // 1. Estados da Subscrição
     var name by remember(subscription) {
         mutableStateOf(if (subscription.name == "Custom") "" else subscription.name)
     }
-    var price by remember(subscription) { mutableStateOf(subscription.price) }
-    var period by remember(subscription) { mutableStateOf(subscription.period) }
+    var amountStr by remember(subscription) { mutableStateOf(subscription.amount.toString()) }
+    var period by remember(subscription) { mutableStateOf(subscription.paymentPeriod) }
     var category by remember(subscription) { mutableStateOf(subscription.category) }
 
-    // Estado para a Data (LocalDate)
-    var selectedDate by remember(subscription) { mutableStateOf(subscription.firstPaymentDate) }
+    // VARIÁVEL ÚNICA: Próxima data de pagamento
+    var nextDate by remember(subscription) { mutableStateOf(subscription.nextPaymentDate) }
+
+    // 2. Estados do Calendário (DatePicker)
     var showDatePicker by remember { mutableStateOf(false) }
+    val datePickerState = rememberDatePickerState()
 
-    // Configuração do DatePicker
-    val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = selectedDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()
-    )
-
+    // Lógica do Diálogo do Calendário
     if (showDatePicker) {
         DatePickerDialog(
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
                 TextButton(onClick = {
                     datePickerState.selectedDateMillis?.let { millis ->
-                        selectedDate = Instant.ofEpochMilli(millis)
+                        val selected = Instant.ofEpochMilli(millis)
                             .atZone(ZoneId.systemDefault())
                             .toLocalDate()
+                        nextDate = selected.format(DateTimeFormatter.ISO_LOCAL_DATE)
                     }
                     showDatePicker = false
                 }) { Text("OK") }
@@ -103,60 +103,57 @@ private fun SubscriptionDetailContent(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF8F8F8))
+            .statusBarsPadding()
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // --- Header ---
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(
-                onClick = onBack,
-                modifier = Modifier.background(Color.White, CircleShape)
-            ) {
-                Icon(Icons.Default.ArrowBack, null)
+            IconButton(onClick = onBack, modifier = Modifier.background(Color.White, CircleShape)) {
+                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
             }
             Text(
                 text = "Subscription Detail",
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp
             )
             Spacer(modifier = Modifier.width(48.dp))
         }
 
         Spacer(modifier = Modifier.height(30.dp))
 
-        SubscriptionIconCircle(
-            sub = subscription.copy(name = if (name.isEmpty()) "Custom" else name),
-            size = 80
-        )
+        SubscriptionIconCircle(sub = subscription, size = 80)
 
         Spacer(modifier = Modifier.height(16.dp))
 
         if (subscription.name == "Custom") {
-            EditableInputBlock(
-                label = "Subscription Name",
-                value = name,
-                onValueChange = { name = it }
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+            EditableInputBlock(label = "Name", value = name, onValueChange = { name = it })
         } else {
-            Text(name, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-            Text("Active", color = Color.Gray)
-            Spacer(modifier = Modifier.height(24.dp))
+            Text(name, fontSize = 24.sp, fontWeight = FontWeight.Bold)
         }
 
+        Spacer(modifier = Modifier.height(24.dp))
+
         // --- Campos de Edição ---
-        EditableInputBlock("Payment", price) { price = it }
+        EditableInputBlock("Payment Amount", amountStr) { amountStr = it }
+
         PeriodSelector(period) { period = it }
+
         CategorySelector(category) { category = it }
 
-        // Campo de Data que abre o DatePicker
-        Box(modifier = Modifier.clickable { showDatePicker = true }) {
+        // CAMPO DE DATA CLICÁVEL (Abre o Calendário)
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .clickable { showDatePicker = true }
+        ) {
             EditableInputBlock(
-                label = "Start Payment",
-                value = selectedDate.format(formatter),
+                label = "Next Payment",
+                value = nextDate,
+                onValueChange = { },
                 hasArrow = true,
-                onValueChange = { /* Não editável via teclado */ }
+                enabled = false // Desativa teclado para usar apenas o calendário
             )
         }
 
@@ -164,11 +161,11 @@ private fun SubscriptionDetailContent(
 
         // --- Botões de Ação ---
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().navigationBarsPadding(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             OutlinedButton(
-                onClick = { /* Lógica de gestão externa */ },
+                onClick = { /* Manage */ },
                 modifier = Modifier.weight(1f).height(56.dp),
                 shape = RoundedCornerShape(12.dp),
                 border = BorderStroke(1.dp, Color(0xFF006064))
@@ -181,10 +178,10 @@ private fun SubscriptionDetailContent(
                 onClick = {
                     onSave(subscription.copy(
                         name = if (name.isEmpty()) "Custom" else name,
-                        price = price,
-                        period = period,
+                        amount = amountStr.toDoubleOrNull() ?: 0.0,
+                        paymentPeriod = period,
                         category = category,
-                        firstPaymentDate = selectedDate
+                        nextPaymentDate = nextDate
                     ))
                 },
                 modifier = Modifier.weight(1f).height(56.dp),

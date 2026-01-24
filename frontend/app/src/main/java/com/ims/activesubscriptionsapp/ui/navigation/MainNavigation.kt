@@ -3,159 +3,168 @@ package com.ims.activesubscriptionsapp.ui.navigation
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.*
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.ims.activesubscriptionsapp.data.models.Subscription
-import com.ims.activesubscriptionsapp.ui.screens.subscriptions.EditSubscriptionDetailScreen
-import com.ims.activesubscriptionsapp.ui.screens.settings.SettingsFlowManager
-import com.ims.activesubscriptionsapp.ui.screens.subscriptions.SubscriptionScreen
+import com.ims.activesubscriptionsapp.data.models.SubscriptionResponse
 import com.ims.activesubscriptionsapp.ui.screens.home.HomeScreen
-import com.ims.activesubscriptionsapp.ui.screens.stats.StatisticsScreen
+import com.ims.activesubscriptionsapp.ui.screens.settings.SettingsFlowManager
 import com.ims.activesubscriptionsapp.ui.screens.stats.StatisticsDetailScreen
-import com.ims.activesubscriptionsapp.ui.screens.auth.LoginScreen
-import com.ims.activesubscriptionsapp.ui.screens.auth.LoginViewModel
+import com.ims.activesubscriptionsapp.ui.screens.stats.StatisticsScreen
+import com.ims.activesubscriptionsapp.ui.screens.subscriptions.EditSubscriptionDetailScreen
+import com.ims.activesubscriptionsapp.ui.screens.subscriptions.SubscriptionScreen
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MainNavigation() {
-    // 0. VIEWMODELS
-    // Criamos o ViewModel aqui para podermos resetar o estado no Logout
-    val loginViewModel: LoginViewModel = viewModel()
+fun MainNavigation(
+    onLogout: () -> Unit
+) {
 
-    // 0. ESTADO DE AUTENTICAÇÃO
-    var isLoggedIn by remember { mutableStateOf(false) }
+    // ================== ESTADO GLOBAL ==================
+    val finalizedSubscriptions = remember { mutableStateListOf<SubscriptionResponse>() } // todas as subscrições do utilizador
+    val selectedQueue = remember { mutableStateListOf<SubscriptionResponse>() } // fila de novas subscrições a editar
 
-    // 1. Estados de Dados e Utilizador
-    val finalizedSubscriptions = remember { mutableStateListOf<Subscription>() }
-    val selectedQueue = remember { mutableStateListOf<Subscription>() }
+    var currentIndex by remember { mutableStateOf(-1) } // índice da fila de edição
+    var showHome by remember { mutableStateOf(false) }
+    var currentTab by remember { mutableStateOf("home") } // "home" ou "stats"
+
+    var editingSub by remember { mutableStateOf<SubscriptionResponse?>(null) } // edição a partir da home
+    var selectedCategoryDetails by remember { mutableStateOf<String?>(null) } // detalhe de categoria
+
+    var settingsFlow by remember { mutableStateOf("none") } // fluxo das settings
     var userEmail by remember { mutableStateOf("user@gmail.com") }
 
-    // 2. Estados de Navegação e Fluxo
-    var currentIndex by remember { mutableStateOf(-1) }
-    var showHome by remember { mutableStateOf(false) }
-    var currentTab by remember { mutableStateOf("home") }
+    // ================== LÓGICA DE NAVEGAÇÃO ==================
+    when {
 
-    // 3. Estados de Ecrãs Secundários
-    var editingSub by remember { mutableStateOf<Subscription?>(null) }
-    var selectedCategoryDetails by remember { mutableStateOf<String?>(null) }
-    var settingsFlow by remember { mutableStateOf("none") }
-
-    // --- LÓGICA DE DECISÃO PRINCIPAL ---
-    if (!isLoggedIn) {
-        LoginScreen(
-            viewModel = loginViewModel, // Passamos o ViewModel instanciado acima
-            onNavigateToRegister = { /* TODO */ },
-            onNavigateToNewPassword = { /* TODO */ },
-            onLoginSuccess = {
-                isLoggedIn = true
-            }
-        )
-    } else {
-        when {
-            settingsFlow != "none" -> {
-                SettingsFlowManager(
-                    initialEmail = userEmail,
-                    flow = settingsFlow,
-                    onNavigate = { settingsFlow = it },
-                    onExit = { settingsFlow = "none" },
-                    onLogout = {
-                        // 1. Reset do Estado de Autenticação (UI)
-                        isLoggedIn = false
-
-                        // 2. RESET DO VIEWMODEL (Resolve o problema do login automático)
-                        loginViewModel.resetState()
-
-                        // 3. LIMPEZA DE DADOS
-                        finalizedSubscriptions.clear()
-                        selectedQueue.clear()
-                        settingsFlow = "none"
-                        showHome = false
-                        currentIndex = -1
-                        userEmail = "user@gmail.com"
-                    }
-                )
-            }
-
-            editingSub != null -> {
-                EditSubscriptionDetailScreen(
-                    subscription = editingSub!!,
-                    onSave = { updated ->
-                        val index = finalizedSubscriptions.indexOfFirst { it.name == updated.name }
-                        if (index != -1) { finalizedSubscriptions[index] = updated }
-                        editingSub = null
-                    },
-                    onBack = { editingSub = null }
-                )
-            }
-
-            selectedCategoryDetails != null -> {
-                StatisticsDetailScreen(
-                    categoryName = selectedCategoryDetails!!,
-                    subscriptions = finalizedSubscriptions.filter { it.category == selectedCategoryDetails },
-                    onBack = { selectedCategoryDetails = null }
-                )
-            }
-
-            showHome -> {
-                if (currentTab == "home") {
-                    HomeScreen(
-                        subscriptions = finalizedSubscriptions,
-                        onAddMore = {
-                            showHome = false
-                            currentIndex = -1
-                        },
-                        onEdit = { editingSub = it },
-                        onNavigateToStats = { currentTab = "stats" },
-                        onSettingsClick = { settingsFlow = "main" }
-                    )
-                } else {
-                    StatisticsScreen(
-                        subscriptions = finalizedSubscriptions,
-                        onBack = { currentTab = "home" },
-                        onNavigateToHome = { currentTab = "home" },
-                        onCategoryClick = { selectedCategoryDetails = it }
-                    )
+        // ================== SETTINGS ==================
+        settingsFlow != "none" -> {
+            SettingsFlowManager(
+                initialEmail = userEmail,
+                flow = settingsFlow,
+                onNavigate = { settingsFlow = it },
+                onExit = { settingsFlow = "none" },
+                onLogout = {
+                    // Limpar estado interno e voltar para login
+                    finalizedSubscriptions.clear()
+                    selectedQueue.clear()
+                    currentIndex = -1
+                    showHome = false
+                    settingsFlow = "none"
+                    onLogout()
                 }
-            }
+            )
+        }
 
-            currentIndex == -1 -> {
-                SubscriptionScreen(
-                    alreadyAdded = finalizedSubscriptions,
-                    onNext = { selections ->
-                        if (selections.isNotEmpty()) {
-                            selectedQueue.clear()
-                            selectedQueue.addAll(selections)
-                            currentIndex = 0
-                        } else {
-                            showHome = true
-                        }
-                    },
-                    onSkip = {
+        // ================== EDIÇÃO DE NOVAS SUBSCRIÇÕES ==================
+        !showHome && currentIndex >= 0 && currentIndex < selectedQueue.size -> {
+            EditSubscriptionDetailScreen(
+                subscription = selectedQueue[currentIndex],
+                onSave = { updated ->
+
+                    // Atualizar subscrição finalizada
+                    val index = finalizedSubscriptions.indexOfFirst { it.id == updated.id }
+                    if (index != -1) finalizedSubscriptions[index] = updated
+
+                    // 🔹 Aqui podes chamar backend para salvar
+                    // saveSubscriptionToBackend(updated)
+
+                    if (currentIndex < selectedQueue.size - 1) {
+                        currentIndex++
+                    } else {
                         selectedQueue.clear()
                         currentIndex = -1
                         showHome = true
                     }
-                )
-            }
-
-            else -> {
-                EditSubscriptionDetailScreen(
-                    subscription = selectedQueue[currentIndex],
-                    onSave = { updated ->
-                        finalizedSubscriptions.add(updated)
-                        if (currentIndex + 1 < selectedQueue.size) {
-                            currentIndex++
-                        } else {
-                            selectedQueue.clear()
-                            currentIndex = -1
-                            showHome = true
-                        }
-                    },
-                    onBack = {
+                },
+                onBack = {
+                    if (currentIndex > 0) currentIndex-- else {
+                        selectedQueue.clear()
                         currentIndex = -1
-                        showHome = finalizedSubscriptions.isNotEmpty()
+                        showHome = true
                     }
+                }
+            )
+        }
+
+        // ================== EDIÇÃO DE SUBSCRIÇÕES EXISTENTES ==================
+        editingSub != null -> {
+            EditSubscriptionDetailScreen(
+                subscription = editingSub!!,
+                onSave = { updated ->
+                    val index = finalizedSubscriptions.indexOfFirst { it.id == updated.id }
+                    if (index != -1) finalizedSubscriptions[index] = updated
+
+                    // 🔹 Salvar no backend
+                    // saveSubscriptionToBackend(updated)
+
+                    editingSub = null
+                },
+                onBack = { editingSub = null }
+            )
+        }
+
+        // ================== DETALHE DE ESTATÍSTICAS ==================
+        selectedCategoryDetails != null -> {
+            StatisticsDetailScreen(
+                categoryName = selectedCategoryDetails!!,
+                subscriptions = finalizedSubscriptions,
+                onBack = { selectedCategoryDetails = null }
+            )
+        }
+
+        // ================== HOME / STATS ==================
+        showHome -> {
+            if (currentTab == "home") {
+                HomeScreen(
+                    subscriptions = finalizedSubscriptions,
+                    onAddMore = {
+                        // Abrir seleção de novas subscrições
+                        showHome = false
+                        currentIndex = -1
+                    },
+                    onEdit = { editingSub = it },
+                    onNavigateToStats = { currentTab = "stats" },
+                    onSettingsClick = { settingsFlow = "main" }
+                )
+            } else {
+                StatisticsScreen(
+                    subscriptions = finalizedSubscriptions,
+                    onBack = { currentTab = "home" },
+                    onNavigateToHome = { currentTab = "home" },
+                    onCategoryClick = { selectedCategoryDetails = it }
                 )
             }
+        }
+
+        // ================== SELEÇÃO DE SUBSCRIÇÕES ==================
+        else -> {
+            SubscriptionScreen(
+                alreadyAdded = finalizedSubscriptions,
+                onNext = { list ->
+
+                    // 1️⃣ Identificar apenas as novas subscrições
+                    val newOnes = list.filter { newSub ->
+                        finalizedSubscriptions.none { it.id == newSub.id }
+                    }
+
+                    // 2️⃣ Adicionar novas subscrições à lista final
+                    newOnes.forEach { finalizedSubscriptions.add(it) }
+
+                    // 🔹 Salvar novas subscrições no backend
+                    // newOnes.forEach { saveSubscriptionToBackend(it) }
+
+                    // 3️⃣ Editar apenas as novas subscrições
+                    if (newOnes.isNotEmpty()) {
+                        selectedQueue.clear()
+                        selectedQueue.addAll(newOnes)
+                        currentIndex = 0
+                        showHome = false
+                    } else {
+                        showHome = true
+                    }
+                },
+                onSkip = {
+                    showHome = true
+                }
+            )
         }
     }
 }

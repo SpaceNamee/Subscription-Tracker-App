@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ims.activesubscriptionsapp.data.models.LoginRequest
 import com.ims.activesubscriptionsapp.data.remote.RetrofitClient
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -13,7 +12,6 @@ class LoginViewModel : ViewModel() {
     private val _loginState = MutableStateFlow<String>("")
     val loginState = _loginState.asStateFlow()
 
-    // NOVO: Função para limpar o estado ao fazer logout
     fun resetState() {
         _loginState.value = ""
     }
@@ -22,14 +20,22 @@ class LoginViewModel : ViewModel() {
         viewModelScope.launch {
             _loginState.value = "Logging in..."
             try {
-                delay(1500)
-                if (email.isNotEmpty() && pass.length >= 4) {
+                val request = LoginRequest(email = email, password = pass)
+                val response = RetrofitClient.api.login(request)
+
+                if (response.isSuccessful && response.body() != null) {
+                    // SUCESSO: Extraímos o token da resposta e guardamos no Client
+                    val token = response.body()?.accessToken
+                    RetrofitClient.authToken = token
+
                     _loginState.value = "Success"
                 } else {
-                    _loginState.value = "Error: Credenciais inválidas"
+                    val errorMsg = response.errorBody()?.string() ?: "Invalid Credentials"
+                    _loginState.value = "Error: $errorMsg"
                 }
             } catch (e: Exception) {
-                _loginState.value = "Error: ${e.message}"
+                _loginState.value = "Error: Failed to connect with the server."
+                e.printStackTrace()
             }
         }
     }
