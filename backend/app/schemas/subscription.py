@@ -11,7 +11,7 @@ class SubscriptionCreate(BaseModel):
     description: Optional[str] = Field(None, max_length=500)
     category: SubscriptionCategory = SubscriptionCategory.OTHER
     amount: float = Field(..., gt=0)
-    currency: str = Field(default="USD", min_length=3, max_length=3)
+    currency: str = Field(default="EUR", min_length=3, max_length=3)
     payment_period: PaymentPeriod
     first_payment_date: Optional[datetime] = None
 
