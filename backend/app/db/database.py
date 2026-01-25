@@ -4,9 +4,6 @@ from sqlalchemy.orm import DeclarativeBase
 from app.core.config import settings
 from pathlib import Path
 
-
-
-print("Database url : ", settings.DATABASE_URL)
 # Create async engine
 engine = create_async_engine(
     f"sqlite+aiosqlite:///{Path(__file__).resolve().parent.parent.parent}/subscriptions.db",
