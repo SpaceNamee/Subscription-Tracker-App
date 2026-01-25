@@ -27,12 +27,10 @@ source venv/bin/activate
 # 3. Install dependencies
 pip install -r requirements.txt
 
-# 4. Copy environment file
-cp .env .env
-# Edit .env with your settings
+# 4. Edit environment file example with your data
 
 # 5. Run the server
-uvicorn app.main:app --reload
+uvicorn app.main:app --reload --port 8001
 ```
 
 ---
