@@ -7,6 +7,7 @@ import com.ims.activesubscriptionsapp.data.remote.RetrofitClient
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import com.ims.activesubscriptionsapp.ui.screens.subscriptions.EditSubscriptionDetailScreen
 class SubscriptionViewModel : ViewModel() {
     private val _subscriptions = MutableStateFlow<List<SubscriptionResponse>>(emptyList())
     val subscriptions = _subscriptions.asStateFlow()
@@ -29,9 +30,11 @@ class SubscriptionViewModel : ViewModel() {
     fun addSubscriptionsFromSelection(selectedItems: List<SubscriptionResponse>) {
         viewModelScope.launch {
             selectedItems.forEach { item ->
+                val amountToSend = item.amount
                 val request = CreateSubscriptionRequest(
                     name = item.name,
-                    amount = if (item.amount == 0.0) 9.99 else item.amount,
+                    amount = amountToSend,
+                    //amount = if (item.amount == 0.0) 9.99 else item.amount,
                     category = item.category.lowercase(),
                     payment_period = item.paymentPeriod,
                     first_payment_date = if (item.nextPaymentDate.isNotBlank())
@@ -65,12 +68,26 @@ class SubscriptionViewModel : ViewModel() {
             }
         }
     }
+    /*
     fun deleteSubscription(id: Int) {
         viewModelScope.launch {
             try {
                 val response = RetrofitClient.api.deleteSubscription(id)
                 if (response.isSuccessful) {
                     _subscriptions.value = _subscriptions.value.filter { it.id != id }
+                }
+            } catch (e: Exception) {
+                _stateMessage.value = e.message ?: "Delete error"
+            }
+        }
+    }*/
+    fun deleteSubscription(id: Int) {
+        viewModelScope.launch {
+            try {
+                val response = RetrofitClient.api.deleteSubscription(id)
+                if (response.isSuccessful) {
+                    _subscriptions.value = _subscriptions.value.filter { it.id != id }
+                    _stateMessage.value = "Subscription deleted"
                 }
             } catch (e: Exception) {
                 _stateMessage.value = e.message ?: "Delete error"

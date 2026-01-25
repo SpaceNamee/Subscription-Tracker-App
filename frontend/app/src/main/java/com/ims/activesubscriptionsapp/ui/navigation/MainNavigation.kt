@@ -88,6 +88,12 @@ fun MainNavigation(
                         currentIndex = -1
                         showHome = true
                     }
+                },
+                onDelete = { id ->
+                    subscriptionViewModel.deleteSubscription(id)
+                    selectedQueue.removeAll { it.id == id }
+                    currentIndex = -1
+                    showHome = true
                 }
             )
         }
@@ -115,7 +121,13 @@ fun MainNavigation(
                     subscriptionViewModel.updateSubscription(updated.id, request)
                     editingSub = null
                 },
-                onBack = { editingSub = null }
+                onBack = { editingSub = null },
+                onDelete = { id ->
+                    subscriptionViewModel.deleteSubscription(id)
+                    editingSub = null
+                    showHome = true
+                }
+
             )
         }
         //Home
