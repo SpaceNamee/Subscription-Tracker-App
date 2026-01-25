@@ -1,5 +1,4 @@
 package com.ims.activesubscriptionsapp.data.remote
-
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,28 +7,22 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
 class PasswordResetViewModel : ViewModel() {
-
-    // --- State ---
+    //State
     var email by mutableStateOf("")
     var code by mutableStateOf("")
-
-    // UI States
+    //UI States
     var isLoading by mutableStateOf(false)
     var errorMessage by mutableStateOf<String?>(null)
-
-    // Navigation Flags (True when ready to move to next screen)
+    //Navigation Flags (True when ready to move to next screen)
     var navigateToVerify by mutableStateOf(false)
     var navigateToReset by mutableStateOf(false)
     var navigateToLogin by mutableStateOf(false)
-
-    // --- Actions ---
-
+    //Actions
     fun onSendCodeClick() {
         if (email.isBlank()) {
             errorMessage = "Please enter your email."
             return
         }
-
         launchNetworkRequest {
             val response = RetrofitClient.api.sendResetCode(mapOf("email" to email))
             if (response.isSuccessful) {
@@ -40,13 +33,11 @@ class PasswordResetViewModel : ViewModel() {
             }
         }
     }
-
     fun onVerifyCodeClick() {
         if (code.length < 6) {
             errorMessage = "Please enter the full 6-digit code."
             return
         }
-
         launchNetworkRequest {
             val response = RetrofitClient.api.verifyResetCode(mapOf("email" to email, "code" to code))
             if (response.isSuccessful) {
@@ -57,13 +48,11 @@ class PasswordResetViewModel : ViewModel() {
             }
         }
     }
-
     fun onResetPasswordClick(newPassword: String) {
         if (newPassword.length < 6) {
             errorMessage = "Password must be at least 6 characters."
             return
         }
-
         launchNetworkRequest {
             val response = RetrofitClient.api.resetPassword(mapOf(
                 "email" to email,
@@ -78,8 +67,7 @@ class PasswordResetViewModel : ViewModel() {
             }
         }
     }
-
-    // Helper to reduce boilerplate
+    //Helper to reduce boilerplate
     private fun launchNetworkRequest(block: suspend () -> Unit) {
         isLoading = true
         errorMessage = null

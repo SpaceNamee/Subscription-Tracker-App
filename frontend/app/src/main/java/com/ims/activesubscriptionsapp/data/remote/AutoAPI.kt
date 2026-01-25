@@ -1,5 +1,4 @@
 package com.ims.activesubscriptionsapp.data.remote
-
 import com.ims.activesubscriptionsapp.data.models.*
 import retrofit2.Response
 import retrofit2.http.Body
@@ -10,7 +9,6 @@ import retrofit2.http.DELETE
 import retrofit2.http.Path
 
 interface AuthApi {
-    // --- Autenticação ---
     @POST("api/v1/auth/login")
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
 
@@ -29,20 +27,17 @@ interface AuthApi {
     @DELETE("api/v1/subscriptions/{subscription_id}")
     suspend fun deleteSubscription(@Path("subscription_id") id: Int): Response<Void>
 
-    // 1. Criar Subscrição (POST)
     @POST("api/v1/subscriptions")
     suspend fun createSubscription(
         @Body request: CreateSubscriptionRequest
     ): Response<SubscriptionResponse>
 
-    // Atualizar Subscrição (PUT)
     @PUT("api/v1/subscriptions/{subscription_id}")
     suspend fun updateSubscription(
         @Path("subscription_id") id: Int,
         @Body request: CreateSubscriptionRequest
     ): Response<SubscriptionResponse>
 
-    // 2. Listar Subscrições (GET) -> ESTE ERA O QUE FALTAVA
     @GET("api/v1/subscriptions")
     suspend fun getSubscriptions(): Response<SubscriptionListResponse>
 }

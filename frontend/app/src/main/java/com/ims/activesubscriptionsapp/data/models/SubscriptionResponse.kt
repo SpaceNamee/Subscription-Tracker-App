@@ -1,5 +1,4 @@
 package com.ims.activesubscriptionsapp.data.models
-
 import com.google.gson.annotations.SerializedName
 
 data class SubscriptionResponse(

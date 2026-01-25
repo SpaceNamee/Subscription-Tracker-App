@@ -1,5 +1,4 @@
 package com.ims.activesubscriptionsapp.data.models
-
 data class CreateSubscriptionRequest(
     val name: String,
     val amount: Double,

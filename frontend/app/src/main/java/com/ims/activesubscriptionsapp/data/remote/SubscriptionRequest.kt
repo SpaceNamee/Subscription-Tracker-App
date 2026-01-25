@@ -8,9 +8,9 @@ data class SubscriptionRequest(
     val amount: Double,
     val currency: String,
     @SerializedName("payment_period")
-    val paymentPeriod: String, // "monthly", "weekly", etc.
+    val paymentPeriod: String, //"monthly", "weekly", etc.
     @SerializedName("first_payment_date")
-    val firstPaymentDate: String, // Formato "yyyy-MM-ddTHH:mm:ss"
+    val firstPaymentDate: String, //Format "yyyy-MM-ddTHH:mm:ss"
     @SerializedName("website_url")
     val websiteUrl: String?,
     @SerializedName("logo_url")

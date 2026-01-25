@@ -1,5 +1,4 @@
 package com.ims.activesubscriptionsapp.data.models
-
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.Color
@@ -21,14 +20,9 @@ data class Subscription(
     fun getNextPaymentDate(): LocalDate {
         val today = LocalDate.now()
         var nextPayment = firstPaymentDate
-
-        // Se a data de início é hoje ou no futuro, esse é o próximo pagamento
         if (!nextPayment.isBefore(today)) {
             return nextPayment
         }
-
-        // Se a data é no passado, calculamos a próxima ocorrência
-        // Usamos .contains para ser flexível com "Month" ou "Monthly"
         while (nextPayment.isBefore(today)) {
             nextPayment = when {
                 period.contains("Week", ignoreCase = true)  -> nextPayment.plusWeeks(1)
@@ -44,8 +38,6 @@ data class Subscription(
     fun getRemainingTime(): String {
         val today = LocalDate.now()
         val nextPayment = getNextPaymentDate()
-
-        // Cálculo exato da diferença de dias
         val daysBetween = ChronoUnit.DAYS.between(today, nextPayment)
 
         return when {

@@ -1,8 +1,7 @@
 package com.ims.activesubscriptionsapp.data.models
-
 import com.google.gson.annotations.SerializedName
 
-// --- AUTENTICAÇÃO ---
+//Authentication
 data class LoginRequest(
     val email: String,
     val password: String
@@ -29,9 +28,7 @@ data class RegisterResponse(
     val isActive: Boolean
 )
 
-// --- SUBSCRIÇÕES (ADICIONA ISTO ABAIXO) ---
-
-// O que tu envias para o Python (POST)
+//Subscription
 data class SubscriptionRequest(
     val name: String,
     val amount: Double,
@@ -44,7 +41,6 @@ data class SubscriptionRequest(
     @SerializedName("logo_url") val logoUrl: String? = null
 )
 
-// O que o Python devolve quando pedes a LISTA (GET)
 data class SubscriptionListResponse(
     val subscriptions: List<SubscriptionResponse>,
     val total: Int
