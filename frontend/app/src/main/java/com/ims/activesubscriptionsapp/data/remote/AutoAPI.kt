@@ -26,19 +26,20 @@ interface AuthApi {
     @POST("api/v1/auth/reset-password")
     suspend fun resetPassword(@Body body: Map<String, String>): Response<Void>
 
-    // --- Endpoints de Subscrições ---
-    @PUT("api/v1/subscriptions/{subscription_id}")
-    suspend fun updateSubscription(
-        @Path("subscription_id") id: Int,
-        @Body request: SubscriptionRequest
-    ): Response<SubscriptionResponse>
-
     @DELETE("api/v1/subscriptions/{subscription_id}")
     suspend fun deleteSubscription(@Path("subscription_id") id: Int): Response<Void>
+
     // 1. Criar Subscrição (POST)
     @POST("api/v1/subscriptions")
     suspend fun createSubscription(
-        @Body request: SubscriptionRequest
+        @Body request: CreateSubscriptionRequest
+    ): Response<SubscriptionResponse>
+
+    // Atualizar Subscrição (PUT)
+    @PUT("api/v1/subscriptions/{subscription_id}")
+    suspend fun updateSubscription(
+        @Path("subscription_id") id: Int,
+        @Body request: CreateSubscriptionRequest
     ): Response<SubscriptionResponse>
 
     // 2. Listar Subscrições (GET) -> ESTE ERA O QUE FALTAVA

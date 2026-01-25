@@ -37,13 +37,62 @@ fun SubscriptionScreen(
     // Lista de sugestões transformada para o modelo da API
     val all = remember {
         listOf(
-            SubscriptionResponse(id = 0, name = "Custom", category = "Other", amount = 0.0, paymentPeriod = "monthly", nextPaymentDate = ""),
-            SubscriptionResponse(id = 1, name = "YouTube", category = "Entertainment", amount = 0.0, paymentPeriod = "monthly", nextPaymentDate = ""),
-            SubscriptionResponse(id = 2, name = "Spotify", category = "Music", amount = 0.0, paymentPeriod = "monthly", nextPaymentDate = ""),
-            SubscriptionResponse(id = 3, name = "Netflix", category = "Entertainment", amount = 0.0, paymentPeriod = "monthly", nextPaymentDate = ""),
-            SubscriptionResponse(id = 4, name = "X.com", category = "Social", amount = 0.0, paymentPeriod = "monthly", nextPaymentDate = ""),
-            SubscriptionResponse(id = 5, name = "Roblox", category = "Games", amount = 0.0, paymentPeriod = "monthly", nextPaymentDate = ""),
-            SubscriptionResponse(id = 6, name = "Paramount+", category = "Entertainment", amount = 0.0, paymentPeriod = "monthly", nextPaymentDate = "")
+            SubscriptionResponse(
+                id = 0,
+                name = "Custom",
+                category = "other",
+                amount = 0.0,
+                paymentPeriod = "monthly",
+                nextPaymentDate = ""
+            ),
+            SubscriptionResponse(
+                id = 1,
+                name = "YouTube",
+                category = "streaming",
+                amount = 0.0,
+                paymentPeriod = "monthly",
+                nextPaymentDate = ""
+            ),
+            SubscriptionResponse(
+                id = 2,
+                name = "Spotify",
+                category = "music",
+                amount = 0.0,
+                paymentPeriod = "monthly",
+                nextPaymentDate = ""
+            ),
+            SubscriptionResponse(
+                id = 3,
+                name = "Netflix",
+                category = "streaming",
+                amount = 0.0,
+                paymentPeriod = "monthly",
+                nextPaymentDate = ""
+            ),
+            SubscriptionResponse(
+                id = 4,
+                name = "X.com",
+                category = "other",
+                amount = 0.0,
+                paymentPeriod = "monthly",
+                nextPaymentDate = ""
+            ),
+            SubscriptionResponse(
+                id = 5,
+                name = "Roblox",
+                category = "gaming",
+                amount = 0.0,
+                paymentPeriod = "monthly",
+                nextPaymentDate = ""
+            ),
+            SubscriptionResponse(
+                id = 6,
+                name = "Paramount+",
+                category = "streaming",
+                amount = 0.0,
+                paymentPeriod = "monthly",
+                nextPaymentDate = ""
+            )
         )
     }
 

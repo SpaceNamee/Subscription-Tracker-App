@@ -176,9 +176,12 @@ fun EditSubscriptionDetailScreen(
 
             Button(
                 onClick = {
+                    // CORREÇÃO: Troca a vírgula por ponto antes de converter para Double
+                    val sanitizedAmount = amountStr.replace(",", ".").toDoubleOrNull() ?: 0.0
+
                     onSave(subscription.copy(
                         name = if (name.isEmpty()) "Custom" else name,
-                        amount = amountStr.toDoubleOrNull() ?: 0.0,
+                        amount = sanitizedAmount, // Agora envia sempre com ponto (ex: 40.54)
                         paymentPeriod = period,
                         category = category,
                         nextPaymentDate = nextDate
