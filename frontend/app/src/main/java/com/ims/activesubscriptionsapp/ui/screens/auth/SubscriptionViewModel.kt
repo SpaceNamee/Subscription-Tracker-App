@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.ims.activesubscriptionsapp.data.models.CreateSubscriptionRequest
 import com.ims.activesubscriptionsapp.data.models.SubscriptionResponse
 import com.ims.activesubscriptionsapp.data.remote.RetrofitClient
+import com.ims.activesubscriptionsapp.data.remote.getErrorDetail
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -21,7 +22,7 @@ class SubscriptionViewModel : ViewModel() {
                 if (response.isSuccessful && response.body() != null) {
                     _subscriptions.value = response.body()!!.subscriptions
                 } else {
-                    _stateMessage.value = "Failed to load subscriptions"
+                    _stateMessage.value = response.getErrorDetail()
                 }
             } catch (e: Exception) {
                 _stateMessage.value = e.message ?: "Unknown error"

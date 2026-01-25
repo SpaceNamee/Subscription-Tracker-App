@@ -1,4 +1,5 @@
 package com.ims.activesubscriptionsapp.ui.screens.auth
+import com.ims.activesubscriptionsapp.data.remote.getErrorDetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -32,8 +33,7 @@ class LoginViewModel : ViewModel() {
                     _loginState.value = "Success"
                     onSuccess()
                 } else {
-                    val errorMsg = response.errorBody()?.string() ?: "Invalid Credentials"
-                    _loginState.value = "Error: $errorMsg"
+                    _loginState.value = "Error: ${response.getErrorDetail()}"
                 }
             } catch (e: Exception) {
                 _loginState.value = "Error: Failed to connect with the server."
