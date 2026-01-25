@@ -1,5 +1,4 @@
 package com.ims.activesubscriptionsapp.ui.components
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -39,13 +38,10 @@ fun SettingsActionItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(icon, null, tint = Color.Gray)
-
         Column(modifier = Modifier.padding(start = 12.dp).weight(1f)) {
             Text(label, fontWeight = FontWeight.Bold, fontSize = 14.sp)
             Text(value, color = Color.Gray, fontSize = 12.sp)
         }
-
-        // A CANETA FOI REMOVIDA DAQUI
     }
 }
 

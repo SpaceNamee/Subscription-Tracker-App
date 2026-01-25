@@ -1,5 +1,4 @@
 package com.ims.activesubscriptionsapp.ui.screens.home
-
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -27,7 +26,6 @@ import com.ims.activesubscriptionsapp.data.models.SubscriptionResponse
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun HomeScreen(
@@ -37,22 +35,18 @@ fun HomeScreen(
     onNavigateToStats: () -> Unit,
     onSettingsClick: () -> Unit
 ) {
-
-    // Data
+    //Data
     val today = LocalDate.now()
     val dayOfWeek = today
         .format(DateTimeFormatter.ofPattern("EEEE,", Locale.getDefault()))
         .replaceFirstChar { it.uppercase() }
     val fullDate = today.format(DateTimeFormatter.ofPattern("d MMMM", Locale.getDefault()))
-
-    // Ordenar subscrições
+    //Order subscriptions
     val sortedSubscriptions = remember(subscriptions) {
         subscriptions.sortedBy { it.nextPaymentDate }
     }
-
-    // Total
+    //Total
     val total = subscriptions.sumOf { it.amount }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -60,8 +54,7 @@ fun HomeScreen(
             .padding(horizontal = 20.dp)
     ) {
         Spacer(modifier = Modifier.height(40.dp))
-
-        // Header
+        //Header
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -75,8 +68,7 @@ fun HomeScreen(
                 Icon(Icons.Outlined.Settings, null, modifier = Modifier.size(28.dp))
             }
         }
-
-        // Card Total
+        //Card Total
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -108,8 +100,7 @@ fun HomeScreen(
                 }
             }
         }
-
-        // Título + Add
+        //Title + add
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -126,8 +117,7 @@ fun HomeScreen(
                 Text("Add")
             }
         }
-
-        // Lista
+        //List
         Box(modifier = Modifier.weight(1f)) {
             if (subscriptions.isEmpty()) {
                 Text(
@@ -149,7 +139,6 @@ fun HomeScreen(
                 }
             }
         }
-
         BottomNavBar(
             onHomeClick = {},
             onStatsClick = onNavigateToStats

@@ -1,5 +1,4 @@
 package com.ims.activesubscriptionsapp.ui.screens.auth
-
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -24,12 +23,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ims.activesubscriptionsapp.ui.components.LocationPermission
 import com.ims.activesubscriptionsapp.ui.components.SetLocation
 import com.ims.activesubscriptionsapp.ui.screens.subscriptions.SubscriptionViewModel
-
-// --- CORES PERSONALIZADAS ---
 val SlateBlue = Color(0xFF5680A0)
 val LightGrayInput = Color(0xFFF6F7F9)
 val TextGray = Color(0xFF6B7280)
-
 @Composable
 fun LoginScreen(
     loginViewModel: LoginViewModel = viewModel(),
@@ -39,14 +35,11 @@ fun LoginScreen(
     onLoginSuccess: () -> Unit
 ) {
     val loginState by loginViewModel.loginState.collectAsState()
-
-    // --- ESTADOS LOCAIS ---
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
     var showLocation by remember { mutableStateOf(false) }
     var showSetLocation by remember { mutableStateOf(false) }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -71,8 +64,7 @@ fun LoginScreen(
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(32.dp))
-
-        // --- INPUT EMAIL ---
+        //INPUT EMAIL
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
@@ -82,8 +74,7 @@ fun LoginScreen(
             singleLine = true
         )
         Spacer(modifier = Modifier.height(16.dp))
-
-        // --- INPUT PASSWORD ---
+        //INPUT PASSWORD
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
@@ -102,8 +93,7 @@ fun LoginScreen(
             singleLine = true
         )
         Spacer(modifier = Modifier.height(16.dp))
-
-        // --- STATUS DE LOGIN ---
+        //STATUS LOGIN
         if (loginState == "Logging in...") {
             CircularProgressIndicator(color = SlateBlue, modifier = Modifier.size(30.dp))
         } else if (loginState.startsWith("Error")) {
@@ -111,7 +101,7 @@ fun LoginScreen(
         }
         Spacer(modifier = Modifier.height(24.dp))
 
-        // --- BOTÃO LOGIN ---
+        //BUTTON LOGIN
         Button(
             onClick = {
                 if (email.isNotBlank() && password.isNotBlank()) {
@@ -119,7 +109,7 @@ fun LoginScreen(
                         email = email,
                         pass = password,
                         subscriptionViewModel = subscriptionViewModel,
-                        onSuccess = { onLoginSuccess() } // Chamado apenas em login correto
+                        onSuccess = { onLoginSuccess() }
                     )
                 }
             },
@@ -130,10 +120,8 @@ fun LoginScreen(
         ) {
             Text("Login", fontSize = 18.sp, fontWeight = FontWeight.Bold)
         }
-
         Spacer(modifier = Modifier.height(16.dp))
-
-        // --- LINK PARA REGISTO ---
+        //LINK REGISTER
         Row {
             Text(text = "Don't have an account? ")
             Text(
@@ -143,8 +131,6 @@ fun LoginScreen(
             )
         }
     }
-
-    // --- DIÁLOGOS DE LOCALIZAÇÃO ---
     if (showLocation) {
         LocationPermission(
             onDismiss = { showLocation = false },
@@ -163,7 +149,6 @@ fun LoginScreen(
             }
         )
     }
-
     if (showSetLocation) {
         SetLocation(
             onDismiss = { showSetLocation = false },

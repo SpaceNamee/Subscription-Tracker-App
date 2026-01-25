@@ -1,5 +1,4 @@
 package com.ims.activesubscriptionsapp.ui.screens.auth
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -20,19 +19,15 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
 @Composable
 fun VerificationCodeScreen(onBack: () -> Unit, onNext: () -> Unit) {
-    // Lista para guardar os 6 dígitos
     val codeValues = remember { mutableStateListOf("", "", "", "", "", "") }
-    // Lista para controlar o foco automático entre as caixas
     val focusRequesters = remember { List(6) { FocusRequester() } }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color.White)
-            .statusBarsPadding() // Resolve o problema do notch no Pixel
+            .statusBarsPadding()
             .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -42,22 +37,18 @@ fun VerificationCodeScreen(onBack: () -> Unit, onNext: () -> Unit) {
                 modifier = Modifier.background(Color(0xFFF2F2F7), CircleShape)
             ) { Icon(Icons.Default.ArrowBack, null) }
         }
-
         Text(
             "Check your Email",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(top = 20.dp)
         )
-
         Text(
             "Enter the 6-digit code sent to you",
             color = Color.Gray,
             fontSize = 14.sp,
             modifier = Modifier.padding(top = 8.dp)
         )
-
-        // Linha com os campos de Input reais
         Row(
             modifier = Modifier
                 .padding(top = 40.dp)
@@ -70,7 +61,6 @@ fun VerificationCodeScreen(onBack: () -> Unit, onNext: () -> Unit) {
                     onValueChange = { input ->
                         if (input.length <= 1) {
                             codeValues[index] = input
-                            // Salto automático para a direita
                             if (input.isNotEmpty() && index < 5) {
                                 focusRequesters[index + 1].requestFocus()
                             }
@@ -94,17 +84,14 @@ fun VerificationCodeScreen(onBack: () -> Unit, onNext: () -> Unit) {
                 )
             }
         }
-
         Spacer(modifier = Modifier.weight(1f))
-
         Button(
             onClick = onNext,
-            // Só ativa o botão quando todos os 6 campos estiverem preenchidos
             enabled = codeValues.all { it.isNotEmpty() },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp)
-                .navigationBarsPadding(), // Margem de segurança inferior
+                .navigationBarsPadding(),
             shape = RoundedCornerShape(15.dp),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFF5387AC),
@@ -114,8 +101,6 @@ fun VerificationCodeScreen(onBack: () -> Unit, onNext: () -> Unit) {
             Text("Verify", color = Color.White)
         }
     }
-
-    // Abre o teclado automaticamente na primeira caixa ao entrar no ecrã
     LaunchedEffect(Unit) {
         focusRequesters[0].requestFocus()
     }

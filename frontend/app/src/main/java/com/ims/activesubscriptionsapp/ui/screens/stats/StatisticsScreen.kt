@@ -22,8 +22,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ims.activesubscriptionsapp.data.models.Subscription
 import com.ims.activesubscriptionsapp.ui.components.BottomNavBar
-
-// Paleta Neon Distinta
 val NeonColors = listOf(
     Color(0xFF00E5FF), // Cyan Neon
     Color(0xFF00FF87), // Verde Esmeralda
@@ -32,7 +30,6 @@ val NeonColors = listOf(
     Color(0xFF7000FF), // Roxo Elétrico
     Color(0xFFFF5C00)  // Laranja Neon
 )
-
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun StatisticsScreen(
@@ -47,7 +44,6 @@ fun StatisticsScreen(
                 entry.value.sumOf { sub -> sub.amount ?: 0.0 }
             }
     }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -72,7 +68,6 @@ fun StatisticsScreen(
                 modifier = Modifier.padding(start = 12.dp)
             )
         }
-
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(24.dp),
@@ -89,16 +84,13 @@ fun StatisticsScreen(
                 }
             }
         }
-
         Spacer(modifier = Modifier.height(24.dp))
         Text("Categories", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-
         LazyColumn(
             modifier = Modifier.weight(1f),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             contentPadding = PaddingValues(vertical = 16.dp)
         ) {
-            // Usamos index para atribuir a cor correta à legenda
             val categoriesList = categoryTotals.keys.toList()
             items(categoriesList.size) { index ->
                 val categoryName = categoriesList[index]
@@ -110,7 +102,6 @@ fun StatisticsScreen(
                 ) { onCategoryClick(categoryName) }
             }
         }
-
         BottomNavBar(onHomeClick = onNavigateToHome, onStatsClick = {})
     }
 }
@@ -118,7 +109,6 @@ fun StatisticsScreen(
 @Composable
 fun DonutChart(categoryTotals: Map<String, Double>) {
     val total = categoryTotals.values.sum()
-
     Box(modifier = Modifier.size(220.dp), contentAlignment = Alignment.Center) {
         Canvas(modifier = Modifier.fillMaxSize()) {
             var startAngle = -90f
@@ -129,7 +119,6 @@ fun DonutChart(categoryTotals: Map<String, Double>) {
                     startAngle = startAngle,
                     sweepAngle = sweepAngle,
                     useCenter = false,
-                    // Aumentei a largura de 40f para 65f para o gráfico parecer mais sólido
                     style = Stroke(width = 65f)
                 )
                 startAngle += sweepAngle
@@ -154,19 +143,16 @@ fun CategoryRow(name: String, amount: Double, color: Color, onClick: () -> Unit)
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Indicador de cor (Legenda)
             Box(
                 modifier = Modifier
                     .size(12.dp)
                     .background(color, CircleShape)
             )
-
             Text(
                 text = name,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(start = 12.dp).weight(1f)
             )
-
             Text(
                 text = "${"%.2f".format(amount)}€",
                 fontWeight = FontWeight.Bold,

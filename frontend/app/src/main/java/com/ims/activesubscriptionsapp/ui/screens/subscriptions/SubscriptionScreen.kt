@@ -1,5 +1,4 @@
 package com.ims.activesubscriptionsapp.ui.screens.subscriptions
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -20,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ims.activesubscriptionsapp.data.models.SubscriptionResponse
 import com.ims.activesubscriptionsapp.ui.components.SubscriptionGridItem
-
 @Composable
 fun SubscriptionScreen(
     alreadyAdded: List<SubscriptionResponse>,
@@ -32,9 +30,6 @@ fun SubscriptionScreen(
             addAll(alreadyAdded)
         }
     }
-
-
-    // Lista de sugestões transformada para o modelo da API
     val all = remember {
         listOf(
             SubscriptionResponse(
@@ -95,12 +90,9 @@ fun SubscriptionScreen(
             )
         )
     }
-
-    // Filtra para não mostrar o que já foi adicionado (exceto o Custom)
     val available = all.filter { sub ->
         sub.name == "Custom" || !alreadyAdded.any { it.name == sub.name }
     }
-
     Column(modifier = Modifier.fillMaxSize().background(Color.White).padding(24.dp)) {
         Text(
             text = "Skip",
@@ -108,14 +100,12 @@ fun SubscriptionScreen(
             color = Color(0xFF007AFF),
             fontSize = 16.sp
         )
-
         Text(
             text = "Select your active subscriptions",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.padding(top = 20.dp)
         )
-
         TextField(
             value = "",
             onValueChange = {},
@@ -131,7 +121,6 @@ fun SubscriptionScreen(
                 focusedIndicatorColor = Color.Transparent
             )
         )
-
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
             modifier = Modifier.weight(1f),
@@ -152,7 +141,6 @@ fun SubscriptionScreen(
                 }
             }
         }
-
         Button(
             onClick = { onNext(selectedItems.toList()) },
             enabled = selectedItems.isNotEmpty(),

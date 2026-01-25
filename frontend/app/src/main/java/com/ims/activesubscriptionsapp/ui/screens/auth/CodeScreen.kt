@@ -22,7 +22,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ims.activesubscriptionsapp.data.remote.PasswordResetViewModel
-
 @Composable
 fun CodeScreen(
     viewModel: PasswordResetViewModel,
@@ -30,16 +29,14 @@ fun CodeScreen(
     onNavigateToReset: () -> Unit
 ) {
     var code by remember { mutableStateOf("") }
-
     LaunchedEffect(viewModel.navigateToReset) {
         if (viewModel.navigateToReset) {
             viewModel.navigateToReset = false
             onNavigateToReset()
         }
     }
-
     Box(modifier = Modifier.fillMaxSize()) {
-        // Top Bar
+        //Top Bar
         Row(
             modifier = Modifier
                 .align(Alignment.TopStart)
@@ -62,7 +59,6 @@ fun CodeScreen(
             )
 
         }
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -70,7 +66,7 @@ fun CodeScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // 1. Heading
+            //Heading
             Text(
                 text = "Check your Email",
                 style = MaterialTheme.typography.headlineMedium.copy(
@@ -79,10 +75,8 @@ fun CodeScreen(
                     fontSize = 32.sp
                 )
             )
-
             Spacer(modifier = Modifier.height(12.dp))
-
-            // 2. Instructions
+            //Instructions
             Text(
                 text = "And Write down the 6-Digit Security Code we have sent you.",
                 style = MaterialTheme.typography.bodyMedium,
@@ -91,9 +85,7 @@ fun CodeScreen(
                 fontSize = 18.sp,
                 lineHeight = 24.sp
             )
-
             Spacer(modifier = Modifier.height(40.dp))
-
             Text(
                 text = "6-Digit Security Code",
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
@@ -101,8 +93,7 @@ fun CodeScreen(
                 textAlign = TextAlign.Left,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
-
-            // 3. 6-Digit Code Input
+            //6-Digit Code Input
             BasicTextField(
                 value = viewModel.code,
                 onValueChange = { if (it.length <= 6) viewModel.code = it },
@@ -116,7 +107,6 @@ fun CodeScreen(
                         for (i in 0 until 6) {
                             val char = if (i < viewModel.code.length) viewModel.code[i].toString() else ""
                             val isFocused = viewModel.code.length == i
-
                             Box(
                                 modifier = Modifier
                                     .weight(1f)
@@ -138,7 +128,6 @@ fun CodeScreen(
                                     color = Color.Black
                                 )
                             }
-
                             if (i < 5) {
                                 Text(
                                     text = "-",
@@ -151,9 +140,7 @@ fun CodeScreen(
                     }
                 }
             )
-
             Spacer(modifier = Modifier.height(40.dp))
-
             if (viewModel.errorMessage != null) {
                 Text(
                     text = viewModel.errorMessage!!,
@@ -162,8 +149,7 @@ fun CodeScreen(
                 )
                 Spacer(modifier = Modifier.height(10.dp))
             }
-
-            // 4. "Check the Code" Button
+            //"Check the Code" Button
             Button(
                 onClick = { viewModel.onVerifyCodeClick() },
                 modifier = Modifier
@@ -178,15 +164,11 @@ fun CodeScreen(
                 } else {
                     Text("Check the Code", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 }
-
-                //Text("Check the Code", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
             }
-
             Spacer(modifier = Modifier.height(16.dp))
-
-            // 5. "Send to different Email" Button
+            //"Send to different Email" Button
             OutlinedButton(
-                onClick = { onNavigateBack() }, // Go back to change email
+                onClick = { onNavigateBack() }, //Go back to change email
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
@@ -196,11 +178,8 @@ fun CodeScreen(
             ) {
                 Text("Send to different Email", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
             }
-
             Spacer(modifier = Modifier.height(60.dp))
-
-            // 6. Footer - Resend
-
+            //Footer - Resend
             Text(
                 text = "Didn't get the Code?\n ",
                 color = Color.Black,
@@ -215,8 +194,6 @@ fun CodeScreen(
                 textAlign = TextAlign.Center,
                 modifier = Modifier.clickable { /* TODO: Resend logic */ }
             )
-
         }
     }
-
 }

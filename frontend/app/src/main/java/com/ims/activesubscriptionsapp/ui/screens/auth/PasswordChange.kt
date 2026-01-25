@@ -9,7 +9,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
 @Composable
 fun PasswordChanged(onNavigateToLogin: () -> Unit) {
     Column(
@@ -24,11 +23,8 @@ fun PasswordChanged(onNavigateToLogin: () -> Unit) {
             textAlign = TextAlign.Center
         )
         Spacer(modifier = Modifier.height(16.dp))
-
         Text("We sent you a confirmation email")
-
         Spacer(modifier = Modifier.height(32.dp))
-
         Button(
             onClick = onNavigateToLogin,
             modifier = Modifier.fillMaxWidth().height(50.dp),

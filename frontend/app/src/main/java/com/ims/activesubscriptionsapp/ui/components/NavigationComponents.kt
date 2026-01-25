@@ -24,7 +24,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
 @Composable
 fun BottomNavBar(onHomeClick: () -> Unit = {}, onStatsClick: () -> Unit = {}) {
     Row(modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp).height(70.dp).clip(RoundedCornerShape(35.dp)).background(Color(0xFF4E4E4E)).padding(horizontal = 10.dp), verticalAlignment = Alignment.CenterVertically) {

@@ -20,12 +20,11 @@ import com.ims.activesubscriptionsapp.ui.theme.LightGrayInput
 @Composable
 fun SetLocation(
     onDismiss: () -> Unit,
-    onSaveLocation: (String) -> Unit, // Callback with the entered location
+    onSaveLocation: (String) -> Unit,
     onBack: () -> Unit,
 ) {
-    // State for the input text field
+    //State for the input text field
     var locationQuery by remember { mutableStateOf("") }
-
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier
@@ -39,7 +38,7 @@ fun SetLocation(
                 modifier = Modifier.padding(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // 1. Title
+                //Title
                 Text(
                     text = "Location Sharing",
                     style = MaterialTheme.typography.titleLarge,
@@ -48,15 +47,11 @@ fun SetLocation(
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center
                 )
-
                 Spacer(modifier = Modifier.height(12.dp))
-
-                // 2. Divider
+                //Divider
                 HorizontalDivider(thickness = 1.dp, color = Color.LightGray.copy(alpha = 0.5f))
-
                 Spacer(modifier = Modifier.height(16.dp))
-
-                // 3. Description
+                //Description
                 Text(
                     text = "In order to provide you with the best experience and to ensure accurate results, we need to know your location. You can use your Current Location or set it Manually.",
                     style = MaterialTheme.typography.bodyMedium,
@@ -64,10 +59,8 @@ fun SetLocation(
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Left
                 )
-
                 Spacer(modifier = Modifier.height(40.dp))
-
-                // 4. Custom Location Input Field
+                //Custom Location Input Field
                 Text(
                     text = "Set your Location",
                     style = MaterialTheme.typography.bodyMedium,
@@ -75,9 +68,7 @@ fun SetLocation(
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Left
                 )
-
                 Spacer(modifier = Modifier.height(10.dp))
-
                 OutlinedTextField(
                     value = locationQuery,
                     onValueChange = { locationQuery = it },
@@ -92,7 +83,7 @@ fun SetLocation(
                         unfocusedBorderColor = Color.Transparent,
                     ),
                     singleLine = true,
-                    // Leading Icon: Location Pin
+                    //Leading Icon: Location Pin
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Filled.LocationOn,
@@ -100,7 +91,6 @@ fun SetLocation(
                             tint = SlateBlue
                         )
                     },
-                    // Trailing Icon: 'X' to clear text (only shows when text is not empty)
                     trailingIcon = {
                         if (locationQuery.isNotEmpty()) {
                             IconButton(onClick = { locationQuery = "" }) {
@@ -113,16 +103,13 @@ fun SetLocation(
                         }
                     }
                 )
-
                 Spacer(modifier = Modifier.height(24.dp))
-
-                // 5. Save Location Button
+                //Save Location Button
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween, // Pushes buttons to edges
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // 1. Back Button (Left)
                     TextButton(
                         onClick = onBack,
                         modifier = Modifier.weight(1f),
@@ -134,18 +121,14 @@ fun SetLocation(
                             fontSize = 15.sp
                         )
                     }
-
                     Spacer(modifier = Modifier.width(8.dp))
-
-                    // 2. Save Button (Right)
+                    //Save Button (Right)
                     Button(
                         onClick = {
                             if (locationQuery.isNotBlank()) {
                                 onSaveLocation(locationQuery)
                             }
                         },
-                        // Use weight(1f) if you want it to fill the remaining space,
-                        // or remove modifier to keep it regular size.
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = SlateBlue),

@@ -26,8 +26,6 @@ import com.ims.activesubscriptionsapp.R
 import com.ims.activesubscriptionsapp.data.models.SubscriptionResponse
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
-
-// 🔹 Mapa de logotipos
 object SubscriptionLogos {
     @DrawableRes
     val logos = mapOf(
@@ -39,7 +37,6 @@ object SubscriptionLogos {
         "Paramount+" to R.drawable.ic_paramount
     )
 }
-
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SubscriptionIconCircle(sub: SubscriptionResponse, size: Int, isSmall: Boolean = false) {
@@ -51,7 +48,7 @@ fun SubscriptionIconCircle(sub: SubscriptionResponse, size: Int, isSmall: Boolea
         contentAlignment = Alignment.Center
     ) {
         if (sub.name == "Custom") {
-            // Apenas a primeira letra
+            //Logo is first letter of the name
             Text(
                 text = sub.name.first().uppercase(),
                 color = Color.White,
@@ -59,7 +56,7 @@ fun SubscriptionIconCircle(sub: SubscriptionResponse, size: Int, isSmall: Boolea
                 fontSize = (size / 2.5).sp
             )
         } else {
-            val logo: Int? = SubscriptionLogos.logos[sub.name] // tipagem explícita
+            val logo: Int? = SubscriptionLogos.logos[sub.name]
             if (logo != null) {
                 Icon(
                     painter = painterResource(id = logo),
@@ -68,7 +65,6 @@ fun SubscriptionIconCircle(sub: SubscriptionResponse, size: Int, isSmall: Boolea
                     modifier = Modifier.size((size * 1.0).dp)
                 )
             } else {
-                // Fallback: primeira letra
                 Text(
                     text = sub.name.first().uppercase(),
                     color = Color.White,
@@ -93,7 +89,6 @@ fun SubscriptionRow(sub: SubscriptionResponse, onClick: () -> Unit) {
         else -> "In $daysBetween days"
     }
     val statusColor = if (daysBetween <= 1L) Color.Red else Color.Gray
-
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -104,12 +99,10 @@ fun SubscriptionRow(sub: SubscriptionResponse, onClick: () -> Unit) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         SubscriptionIconCircle(sub, 45, true)
-
         Column(modifier = Modifier.padding(start = 16.dp).weight(1f)) {
             Text(sub.name, fontWeight = FontWeight.Bold)
             Text(text = timeRemaining, color = statusColor, fontSize = 12.sp)
         }
-
         Column(horizontalAlignment = Alignment.End) {
             Text("${"%.2f".format(sub.amount)}€", fontWeight = FontWeight.Bold)
             Text("Manage >", color = Color.Gray, fontSize = 12.sp)

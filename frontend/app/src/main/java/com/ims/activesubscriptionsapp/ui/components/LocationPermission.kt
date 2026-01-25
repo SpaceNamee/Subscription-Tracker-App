@@ -14,7 +14,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.ims.activesubscriptionsapp.ui.theme.SlateBlue
-
 @Composable
 fun LocationPermission(
     onDismiss: () -> Unit,
@@ -34,7 +33,7 @@ fun LocationPermission(
                 modifier = Modifier.padding(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Header: Title + Close Button
+                //Header: Title + Close Button
                 Box(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = "Location is needed",
@@ -43,7 +42,6 @@ fun LocationPermission(
                         color = Color.Black,
                         modifier = Modifier.align(Alignment.CenterStart)
                     )
-
                     IconButton(
                         onClick = onDismiss,
                         modifier = Modifier
@@ -57,15 +55,11 @@ fun LocationPermission(
                         )
                     }
                 }
-
                 Spacer(modifier = Modifier.height(12.dp))
-
-                // Thin divider line
+                //Thin divider line
                 HorizontalDivider(thickness = 1.dp, color = Color.LightGray.copy(alpha = 0.5f))
-
                 Spacer(modifier = Modifier.height(16.dp))
-
-                // Body Text
+                //Body Text
                 Text(
                     text = "In order to provide you with the best experience and to ensure accurate results, we need to know your location. You can use your Current Location or set it Manually.",
                     style = MaterialTheme.typography.bodyMedium,
@@ -73,16 +67,14 @@ fun LocationPermission(
                     textAlign = TextAlign.Start,
                     lineHeight = 20.sp
                 )
-
                 Spacer(modifier = Modifier.height(24.dp))
-
-                // Buttons Row
+                //Buttons Row
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // "Set Location" Text Button
+                    //"Set Location" Text Button
                     TextButton(
                         onClick =  onSetLocationClick,
                         colors = ButtonDefaults.textButtonColors(contentColor = Color.Black)
@@ -93,8 +85,7 @@ fun LocationPermission(
                             fontSize = 15.sp
                         )
                     }
-
-                    // "Use Current" Filled Button
+                    //"Use Current" Filled Button
                     Button(
                         onClick = onUseCurrentLocation,
                         shape = RoundedCornerShape(8.dp),

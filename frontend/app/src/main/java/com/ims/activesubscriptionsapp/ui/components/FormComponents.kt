@@ -1,5 +1,4 @@
 package com.ims.activesubscriptionsapp.ui.components
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -28,7 +27,6 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
 @Composable
 fun EditableInputBlock(label: String, value: String, hasArrow: Boolean = false, onValueChange: (String) -> Unit) {
     Column(modifier = Modifier.padding(vertical = 6.dp).fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(Color(0xFF9E9E9E)).padding(horizontal = 16.dp, vertical = 8.dp)) {
@@ -39,7 +37,6 @@ fun EditableInputBlock(label: String, value: String, hasArrow: Boolean = false, 
         }
     }
 }
-
 @Composable
 fun PeriodSelector(currentPeriod: String, onPeriodSelected: (String) -> Unit) {
     var exp by remember { mutableStateOf(false) }
@@ -56,7 +53,6 @@ fun PeriodSelector(currentPeriod: String, onPeriodSelected: (String) -> Unit) {
         }
     }
 }
-
 @Composable
 fun CategorySelector(currentCategory: String, onCategorySelected: (String) -> Unit) {
     var exp by remember { mutableStateOf(false) }

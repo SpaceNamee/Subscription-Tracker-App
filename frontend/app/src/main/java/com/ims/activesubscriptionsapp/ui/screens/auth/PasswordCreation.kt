@@ -19,7 +19,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ims.activesubscriptionsapp.data.remote.PasswordResetViewModel
-
 @Composable
 fun PasswordCreation(
     viewModel: PasswordResetViewModel,
@@ -29,19 +28,16 @@ fun PasswordCreation(
     var newPassword by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
     var passwordError by remember { mutableStateOf<String?>(null) }
-
     var isNewPasswordVisible by remember { mutableStateOf(false) }
     var isConfirmPasswordVisible by remember { mutableStateOf(false) }
-
     LaunchedEffect(viewModel.navigateToLogin) {
         if (viewModel.navigateToLogin) {
             viewModel.navigateToLogin = false
             onNavigateToLogin()
         }
     }
-
     Box(modifier = Modifier.fillMaxSize()) {
-        // Top Bar
+        //Top Bar
         Row(
             modifier = Modifier
                 .align(Alignment.TopStart)
@@ -63,7 +59,6 @@ fun PasswordCreation(
                 )
             )
         }
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -71,7 +66,7 @@ fun PasswordCreation(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // 1. Heading
+            //Heading
             Text(
                 text = "Set New\n Password",
                 style = MaterialTheme.typography.headlineMedium.copy(
@@ -81,9 +76,7 @@ fun PasswordCreation(
                     textAlign = TextAlign.Center
                 )
             )
-
             Spacer(modifier = Modifier.height(12.dp))
-
             Text(
                 text = "You can always change it later.",
                 style = MaterialTheme.typography.bodyMedium,
@@ -91,10 +84,8 @@ fun PasswordCreation(
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                 fontSize = 16.sp
             )
-
             Spacer(modifier = Modifier.height(40.dp))
-
-            // 2. New Password Field
+            //New Password Field
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "New Password",
@@ -102,7 +93,6 @@ fun PasswordCreation(
                     color = Color.DarkGray,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
-
                 OutlinedTextField(
                     value = newPassword,
                     onValueChange = { newPassword = it },
@@ -126,10 +116,8 @@ fun PasswordCreation(
                     }
                 )
             }
-
             Spacer(modifier = Modifier.height(20.dp))
-
-            // 3. Confirm Password Field
+            //Confirm Password Field
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "Confirm Password",
@@ -137,7 +125,6 @@ fun PasswordCreation(
                     color = Color.DarkGray,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
-
                 OutlinedTextField(
                     value = confirmPassword,
                     onValueChange = { confirmPassword = it },
@@ -161,9 +148,7 @@ fun PasswordCreation(
                     }
                 )
             }
-
             Spacer(modifier = Modifier.height(40.dp))
-
             if (viewModel.errorMessage != null || passwordError != null) {
                 Text(
                     text = viewModel.errorMessage ?: passwordError ?: "",
@@ -172,8 +157,7 @@ fun PasswordCreation(
                 )
                 Spacer(modifier = Modifier.height(12.dp))
             }
-
-            // 4. Save Button
+            //Save Button
             Button(
                 onClick = {
                     if (newPassword != confirmPassword) {
@@ -192,9 +176,7 @@ fun PasswordCreation(
             ) {
                 Text("Change Password", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
             }
-
             Spacer(modifier = Modifier.height(50.dp))
-
             Text(
                 text = "Need help?",
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
@@ -202,9 +184,7 @@ fun PasswordCreation(
                 modifier = Modifier.padding(bottom = 8.dp),
                 textAlign = TextAlign.Center
             )
-
             Spacer(modifier = Modifier.height(15.dp))
-
             Text(
                 text = "Write Us",
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.ExtraBold),

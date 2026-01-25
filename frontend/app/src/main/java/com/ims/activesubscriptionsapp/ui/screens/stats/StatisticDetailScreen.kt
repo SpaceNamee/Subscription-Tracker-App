@@ -1,5 +1,4 @@
 package com.ims.activesubscriptionsapp.ui.screens.stats
-
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
@@ -23,7 +22,6 @@ import com.ims.activesubscriptionsapp.data.models.SubscriptionResponse
 import com.ims.activesubscriptionsapp.ui.components.SubscriptionIconCircle
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
-
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun StatisticsDetailScreen(
@@ -31,13 +29,11 @@ fun StatisticsDetailScreen(
     subscriptions: List<SubscriptionResponse>,
     onBack: () -> Unit
 ) {
-    // 1. Filtrar e 2. Ordenar (usando o campo string da data)
     val filteredAndSorted = remember(subscriptions, categoryName) {
         subscriptions
             .filter { it.category == categoryName }
             .sortedBy { it.nextPaymentDate }
     }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -54,7 +50,6 @@ fun StatisticsDetailScreen(
             }
             Text(text = categoryName, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(start = 12.dp))
         }
-
         if (filteredAndSorted.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 Text(text = "No subscriptions in $categoryName.", color = Color.Gray)
@@ -87,27 +82,22 @@ fun SubscriptionDetailRow(sub: SubscriptionResponse) {
 
             Column(modifier = Modifier.padding(start = 16.dp).weight(1f)) {
                 Text(text = sub.name, fontWeight = FontWeight.Bold, fontSize = 16.sp)
-
-                // Cálculo manual do tempo restante para evitar o erro de inferência
                 val daysUntil = try {
                     val nextDate = LocalDate.parse(sub.nextPaymentDate)
                     ChronoUnit.DAYS.between(LocalDate.now(), nextDate)
                 } catch (e: Exception) { -1L }
-
                 val timeRemaining = when {
                     daysUntil == 0L -> "Today"
                     daysUntil == 1L -> "Tomorrow"
                     daysUntil > 1L -> "In $daysUntil days"
                     else -> "Expired"
                 }
-
                 Text(
                     text = "${sub.paymentPeriod} • $timeRemaining",
                     fontSize = 12.sp,
                     color = if (daysUntil <= 1L) Color.Red else Color.Gray
                 )
             }
-
             Text(
                 text = "${"%.2f".format(sub.amount)}€",
                 fontWeight = FontWeight.ExtraBold,

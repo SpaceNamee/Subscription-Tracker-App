@@ -33,20 +33,15 @@ fun RegisterScreen(
     onRegisterSuccess: () -> Unit,
     onNavigateToLogin: () -> Unit
 ) {
-
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var repeatPassword by remember { mutableStateOf("") }
-
     var isPasswordVisible by remember { mutableStateOf(false) }
     var isRepeatVisible by remember { mutableStateOf(false) }
-
     var showLocation by remember { mutableStateOf(false) }
     var showSetLocation by remember { mutableStateOf(false) }
-
     val statusMessage by viewModel.registerState.collectAsState()
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -55,8 +50,7 @@ fun RegisterScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Spacer(modifier = Modifier.height(80.dp))
-
-        // 1. Header
+        //Header
         Text(
             text = "Welcome to SubTrack",
             style = MaterialTheme.typography.headlineMedium.copy(
@@ -65,29 +59,23 @@ fun RegisterScreen(
                 fontSize = 35.sp
             )
         )
-
         Spacer(modifier = Modifier.height(8.dp))
-
         Text(
             text = "Create an Account for FREE",
             style = MaterialTheme.typography.bodyMedium,
             color = TextGray,
             fontSize = 20.sp
         )
-
         Spacer(modifier = Modifier.height(32.dp))
-
-        // 2. Name Field (UI Only)
+        //Name Field
         RegisterField(
             label = "Name",
             value = name,
             onValueChange = { name = it },
             placeholder = "e.g. John Doe"
         )
-
         Spacer(modifier = Modifier.height(16.dp))
-
-        // 3. Email Field
+        //Email Field
         RegisterField(
             label = "Email",
             value = email,
@@ -95,10 +83,8 @@ fun RegisterScreen(
             placeholder = "e.g. example@gmail.com",
             keyboardType = KeyboardType.Email
         )
-
         Spacer(modifier = Modifier.height(16.dp))
-
-        // 4. Password Field
+        //Password Field
         RegisterPasswordField(
             label = "Password",
             value = password,
@@ -106,10 +92,8 @@ fun RegisterScreen(
             isVisible = isPasswordVisible,
             onToggleVisibility = { isPasswordVisible = !isPasswordVisible }
         )
-
         Spacer(modifier = Modifier.height(16.dp))
-
-        // 5. Repeat Password Field
+        //Repeat Password Field
         RegisterPasswordField(
             label = "Repeat Password",
             value = repeatPassword,
@@ -117,10 +101,8 @@ fun RegisterScreen(
             isVisible = isRepeatVisible,
             onToggleVisibility = { isRepeatVisible = !isRepeatVisible }
         )
-
         Spacer(modifier = Modifier.height(30.dp))
-
-        // 6. Register Button
+        //Register Button
         Button(
             onClick = { showLocation = true },
             modifier = Modifier
@@ -131,16 +113,13 @@ fun RegisterScreen(
         ) {
             Text("Register", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
         }
-
         Spacer(modifier = Modifier.height(16.dp))
-
-        // Status Message
+        //Status Message
         if (statusMessage.isNotEmpty()) {
             Text(text = statusMessage, color = if(statusMessage.startsWith("Success")) SlateBlue else Color.Red)
             Spacer(modifier = Modifier.height(16.dp))
         }
-
-        // 7. Footer
+        //Footer
         Text(
             text = "Already have an account? ",
             color = Color.Black,
@@ -155,7 +134,6 @@ fun RegisterScreen(
             textAlign = TextAlign.Center,
             modifier = Modifier.clickable { onNavigateToLogin() }
         )
-
         if (showLocation) {
             LocationPermission(
                 onDismiss = { showLocation = false },
@@ -165,33 +143,26 @@ fun RegisterScreen(
                     viewModel.performRegister(email, password, repeatPassword)
                 },
                 onSetLocationClick = {
-                    // Close this dialog and open the manual entry one
                     showLocation = false
                     showSetLocation = true
                 }
             )
         }
-
         if (showSetLocation) {
             SetLocation(
                 onDismiss = { showSetLocation = false },
                 onBack = {
-                    // Go back to the previous dialog
                     showSetLocation = false
                     showLocation = true
                 },
                 onSaveLocation = { location ->
                     showSetLocation = false
-                    // Register
                     viewModel.performRegister(email, password, repeatPassword)
                 }
             )
         }
     }
 }
-
-
-
 @Composable
 fun RegisterField(
     label: String,
@@ -207,7 +178,6 @@ fun RegisterField(
             color = Color.DarkGray,
             modifier = Modifier.padding(bottom = 8.dp)
         )
-
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
@@ -226,7 +196,6 @@ fun RegisterField(
         )
     }
 }
-
 @Composable
 fun RegisterPasswordField(
     label: String,
@@ -242,7 +211,6 @@ fun RegisterPasswordField(
             color = Color.DarkGray,
             modifier = Modifier.padding(bottom = 8.dp)
         )
-
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,

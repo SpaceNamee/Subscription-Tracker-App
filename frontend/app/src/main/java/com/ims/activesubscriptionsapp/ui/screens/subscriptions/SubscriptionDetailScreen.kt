@@ -33,26 +33,22 @@ fun EditableInputBlock(
     value: String,
     onValueChange: (String) -> Unit,
     hasArrow: Boolean = false,
-    enabled: Boolean = true // 1. Adiciona o parâmetro com valor padrão true
+    enabled: Boolean = true
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(text = label, color = Color.Gray, fontSize = 12.sp)
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
-            enabled = enabled, // 2. Passa o parâmetro para o TextField
+            enabled = enabled,
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
-// No trailingIcon do OutlinedTextField
             trailingIcon = if (hasArrow) {
                 { Icon(Icons.Default.ArrowDropDown, null) } // ArrowDropDown costuma estar sempre disponível
             } else null
-            // ... outros estilos que já tenhas (colors, textStyle, etc.)
         )
     }
 }
-
-
 @OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
@@ -61,22 +57,15 @@ fun EditSubscriptionDetailScreen(
     onSave: (SubscriptionResponse) -> Unit,
     onBack: () -> Unit
 ) {
-    // 1. Estados da Subscrição
     var name by remember(subscription) {
         mutableStateOf(if (subscription.name == "Custom") "" else subscription.name)
     }
     var amountStr by remember(subscription) { mutableStateOf(subscription.amount.toString()) }
     var period by remember(subscription) { mutableStateOf(subscription.paymentPeriod) }
     var category by remember(subscription) { mutableStateOf(subscription.category) }
-
-    // VARIÁVEL ÚNICA: Próxima data de pagamento
     var nextDate by remember(subscription) { mutableStateOf(subscription.nextPaymentDate) }
-
-    // 2. Estados do Calendário (DatePicker)
     var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
-
-    // Lógica do Diálogo do Calendário
     if (showDatePicker) {
         DatePickerDialog(
             onDismissRequest = { showDatePicker = false },
@@ -98,7 +87,6 @@ fun EditSubscriptionDetailScreen(
             DatePicker(state = datePickerState)
         }
     }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -107,7 +95,6 @@ fun EditSubscriptionDetailScreen(
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // --- Header ---
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack, modifier = Modifier.background(Color.White, CircleShape)) {
                 Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -121,29 +108,18 @@ fun EditSubscriptionDetailScreen(
             )
             Spacer(modifier = Modifier.width(48.dp))
         }
-
         Spacer(modifier = Modifier.height(30.dp))
-
         SubscriptionIconCircle(sub = subscription, size = 80)
-
         Spacer(modifier = Modifier.height(16.dp))
-
         if (subscription.name == "Custom") {
             EditableInputBlock(label = "Name", value = name, onValueChange = { name = it })
         } else {
             Text(name, fontSize = 24.sp, fontWeight = FontWeight.Bold)
         }
-
         Spacer(modifier = Modifier.height(24.dp))
-
-        // --- Campos de Edição ---
         EditableInputBlock("Payment Amount", amountStr) { amountStr = it }
-
         PeriodSelector(period) { period = it }
-
         CategorySelector(category) { category = it }
-
-        // CAMPO DE DATA CLICÁVEL (Abre o Calendário)
         Box(modifier = Modifier
             .fillMaxWidth()
             .clickable { showDatePicker = true }
@@ -153,13 +129,10 @@ fun EditSubscriptionDetailScreen(
                 value = nextDate,
                 onValueChange = { },
                 hasArrow = true,
-                enabled = false // Desativa teclado para usar apenas o calendário
+                enabled = false
             )
         }
-
         Spacer(modifier = Modifier.weight(1f))
-
-        // --- Botões de Ação ---
         Row(
             modifier = Modifier.fillMaxWidth().navigationBarsPadding(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -173,15 +146,12 @@ fun EditSubscriptionDetailScreen(
                 Text("Manage", color = Color(0xFF006064))
                 Icon(Icons.Default.CallMade, null, modifier = Modifier.size(18.dp))
             }
-
             Button(
                 onClick = {
-                    // CORREÇÃO: Troca a vírgula por ponto antes de converter para Double
                     val sanitizedAmount = amountStr.replace(",", ".").toDoubleOrNull() ?: 0.0
-
                     onSave(subscription.copy(
                         name = if (name.isEmpty()) "Custom" else name,
-                        amount = sanitizedAmount, // Agora envia sempre com ponto (ex: 40.54)
+                        amount = sanitizedAmount,
                         paymentPeriod = period,
                         category = category,
                         nextPaymentDate = nextDate

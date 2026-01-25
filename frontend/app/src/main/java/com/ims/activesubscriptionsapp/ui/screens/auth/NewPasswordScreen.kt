@@ -14,7 +14,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ims.activesubscriptionsapp.data.remote.PasswordResetViewModel
-
 @Composable
 fun NewPasswordScreen(
     viewModel: PasswordResetViewModel,
@@ -22,20 +21,17 @@ fun NewPasswordScreen(
     onNavigateToCode: () -> Unit
 ) {
     var email by remember { mutableStateOf("") }
-
     LaunchedEffect(viewModel.navigateToVerify) {
         if (viewModel.navigateToVerify) {
             viewModel.navigateToVerify = false
             onNavigateToCode()
         }
     }
-
     Box(modifier = Modifier.fillMaxSize()) {
-
         Row(
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .padding(top = 48.dp, start = 16.dp), // Position the whole row
+                .padding(top = 48.dp, start = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(
@@ -55,7 +51,6 @@ fun NewPasswordScreen(
                 )
             )
         }
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -63,8 +58,7 @@ fun NewPasswordScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-
-            // 1. Header
+            //Header
             Text(
                 text = "Forgot your Password?",
                 style = MaterialTheme.typography.headlineMedium.copy(
@@ -74,9 +68,7 @@ fun NewPasswordScreen(
                     textAlign = TextAlign.Center
                 )
             )
-
             Spacer(modifier = Modifier.height(16.dp))
-
             Text(
                 text = "Don't worry, we can restore it.",
                 style = MaterialTheme.typography.bodyMedium,
@@ -84,10 +76,8 @@ fun NewPasswordScreen(
                 textAlign = TextAlign.Center,
                 fontSize = 20.sp
             )
-
             Spacer(modifier = Modifier.height(40.dp))
-
-            // 2. Email Field
+            //Email Field
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     text = "Email",
@@ -95,7 +85,6 @@ fun NewPasswordScreen(
                     color = Color.DarkGray,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
-
                 OutlinedTextField(
                     value = viewModel.email,
                     onValueChange = { viewModel.email = it },
@@ -112,10 +101,8 @@ fun NewPasswordScreen(
                     singleLine = true
                 )
             }
-
             Spacer(modifier = Modifier.height(30.dp))
-
-            // 3. Submit Button
+            //Submit Button
             Button(
                 onClick = {
                     viewModel.onSendCodeClick()
@@ -131,15 +118,11 @@ fun NewPasswordScreen(
                 } else {
                     Text("Send Code to Email", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
                 }
-                //Text("Send Code to Email", fontSize = 16.sp, fontWeight = FontWeight.SemiBold)
             }
-
             if (viewModel.errorMessage != null) {
                 Text(text = viewModel.errorMessage!!, color = Color.Red)
             }
-
             Spacer(modifier = Modifier.height(40.dp))
-
             Text(
                 text = "Not what you were looking for?",
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
@@ -147,9 +130,7 @@ fun NewPasswordScreen(
                 modifier = Modifier.padding(bottom = 8.dp),
                 textAlign = TextAlign.Center
             )
-
             Spacer(modifier = Modifier.height(15.dp))
-
             Text(
                 text = "Write Us",
                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.ExtraBold),

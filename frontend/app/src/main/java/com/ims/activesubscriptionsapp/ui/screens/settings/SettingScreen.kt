@@ -1,5 +1,4 @@
 package com.ims.activesubscriptionsapp.ui.screens.settings
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -21,28 +20,24 @@ import com.ims.activesubscriptionsapp.ui.screens.auth.SetPasswordScreen
 import com.ims.activesubscriptionsapp.ui.screens.auth.SuccessScreen
 import com.ims.activesubscriptionsapp.ui.screens.auth.VerificationCodeScreen
 import com.ims.activesubscriptionsapp.ui.components.CurrencyDisplayItem
-
 @Composable
 fun SettingsFlowManager(
     initialEmail: String,
     flow: String,
     onNavigate: (String) -> Unit,
     onExit: () -> Unit,
-    onLogout: () -> Unit // <--- NOVO: Parâmetro para lidar com a saída
+    onLogout: () -> Unit
 ) {
-    // FIX: Usamos remember(initialEmail) para que o estado atualize se o email de login mudar
     var userEmail by remember(initialEmail) { mutableStateOf(initialEmail) }
     var pendingEmail by remember { mutableStateOf("") }
-
     when (flow) {
         "main" -> SettingsScreen(
             currentEmail = userEmail,
             onBack = onExit,
             onEmail = { onNavigate("email1") },
             onPass = { onNavigate("pass1") },
-            onLogout = onLogout // <--- Passa a função para o ecrã
+            onLogout = onLogout
         )
-
         "email1" -> AuthStepScreen(
             title = "Type your new email",
             label = "Email",
@@ -52,7 +47,6 @@ fun SettingsFlowManager(
                 onNavigate("email2")
             }
         )
-
         "email2" -> VerificationCodeScreen(
             onBack = { onNavigate("email1") },
             onNext = {
@@ -60,23 +54,20 @@ fun SettingsFlowManager(
                 onNavigate("emailSuccess")
             }
         )
-
         "emailSuccess" -> SuccessScreen("Email Changed Successfully", onDone = { onNavigate("main") })
-
         "pass1" -> AuthStepScreen("Email Verification", "Email", onBack = { onNavigate("main") }, onNext = { onNavigate("pass2") })
         "pass2" -> VerificationCodeScreen(onBack = { onNavigate("pass1") }, onNext = { onNavigate("pass3") })
         "pass3" -> SetPasswordScreen(onBack = { onNavigate("pass2") }, onNext = { onNavigate("passSuccess") })
         "passSuccess" -> SuccessScreen("Password Changed Successfully", onDone = { onNavigate("main") })
     }
 }
-
 @Composable
 fun SettingsScreen(
     currentEmail: String,
     onBack: () -> Unit,
     onEmail: () -> Unit,
     onPass: () -> Unit,
-    onLogout: () -> Unit // <--- Parâmetro adicionado
+    onLogout: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -86,7 +77,6 @@ fun SettingsScreen(
             .padding(horizontal = 20.dp)
     ) {
         Spacer(modifier = Modifier.height(16.dp))
-
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack, modifier = Modifier.background(Color.White, CircleShape)) {
                 Icon(Icons.Default.ArrowBack, null)
@@ -100,17 +90,12 @@ fun SettingsScreen(
             )
             Spacer(modifier = Modifier.size(48.dp))
         }
-
         Text("Account settings", color = Color.Gray, fontSize = 12.sp, modifier = Modifier.padding(top = 24.dp))
-
         SettingsActionItem("Email", currentEmail, Icons.Default.Email, onEmail)
         SettingsActionItem("Password", "********", Icons.Default.Lock, onPass)
-
         Text("Other info", color = Color.Gray, fontSize = 12.sp, modifier = Modifier.padding(top = 16.dp))
         CurrencyDisplayItem("EUR €")
-
         Spacer(modifier = Modifier.weight(1f))
-
         Button(
             onClick = onLogout, // <--- Agora o botão chama a função de saída
             modifier = Modifier.fillMaxWidth().padding(bottom = 20.dp),

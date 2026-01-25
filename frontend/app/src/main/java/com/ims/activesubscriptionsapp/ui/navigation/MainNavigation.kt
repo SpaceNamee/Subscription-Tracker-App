@@ -1,5 +1,4 @@
 package com.ims.activesubscriptionsapp.ui.navigation
-
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.*
@@ -23,7 +22,6 @@ fun MainNavigation(
 ) {
     val finalizedSubscriptions by subscriptionViewModel.subscriptions.collectAsState()
     val selectedQueue = remember { mutableStateListOf<SubscriptionResponse>() }
-
     var currentIndex by remember { mutableStateOf(-1) }
     var showHome by remember { mutableStateOf(false) }
     var currentTab by remember { mutableStateOf("home") }
@@ -33,7 +31,7 @@ fun MainNavigation(
     val userEmail by remember { mutableStateOf("test@gmail.com") }
 
     when {
-        // ================== CONFIGURAÇÕES E SAÍDA ==================
+        //Configurations and exit
         settingsFlow != "none" -> {
             SettingsFlowManager(
                 initialEmail = userEmail,
@@ -50,8 +48,7 @@ fun MainNavigation(
                 }
             )
         }
-
-        // ================== EDIÇÃO DE NOVAS SUBSCRIÇÕES (Fila) ==================
+        //Edit new subscriptions
         !showHome && currentIndex >= 0 && currentIndex < selectedQueue.size -> {
             EditSubscriptionDetailScreen(
                 subscription = selectedQueue[currentIndex],
@@ -62,14 +59,12 @@ fun MainNavigation(
                         "Year" -> "yearly"
                         else -> updated.paymentPeriod.lowercase()
                     }
-
                     val finalDate = if (updated.nextPaymentDate.isBlank())
                         "${LocalDate.now()}T12:00:00"
                     else if (updated.nextPaymentDate.contains("T"))
                         updated.nextPaymentDate
                     else
                         "${updated.nextPaymentDate}T12:00:00"
-
                     val request = CreateSubscriptionRequest(
                         name = updated.name,
                         amount = if (updated.amount == 0.0) 9.99 else updated.amount,
@@ -78,10 +73,7 @@ fun MainNavigation(
                         first_payment_date = finalDate,
                         currency = updated.currency.ifBlank { "EUR" }
                     )
-
-                    // 🔥 Atualização para usar o novo método
                     subscriptionViewModel.addSubscriptionsFromSelection(listOf(updated))
-
                     if (currentIndex < selectedQueue.size - 1) {
                         currentIndex++
                     } else {
@@ -99,8 +91,7 @@ fun MainNavigation(
                 }
             )
         }
-
-        // ================== EDIÇÃO DE SUBSCRIÇÕES EXISTENTES (Home) ==================
+        //Edit existant subscriptions
         editingSub != null -> {
             EditSubscriptionDetailScreen(
                 subscription = editingSub!!,
@@ -111,10 +102,8 @@ fun MainNavigation(
                         "Year" -> "yearly"
                         else -> updated.paymentPeriod.lowercase()
                     }
-
                     val finalDate = if (updated.nextPaymentDate.contains("T"))
                         updated.nextPaymentDate else "${updated.nextPaymentDate}T12:00:00"
-
                     val request = CreateSubscriptionRequest(
                         name = updated.name,
                         amount = updated.amount,
@@ -123,15 +112,13 @@ fun MainNavigation(
                         first_payment_date = finalDate,
                         currency = updated.currency.ifBlank { "EUR" }
                     )
-
                     subscriptionViewModel.updateSubscription(updated.id, request)
                     editingSub = null
                 },
                 onBack = { editingSub = null }
             )
         }
-
-        // ================== HOME / STATS / SELEÇÃO ==================
+        //Home
         selectedCategoryDetails != null -> {
             StatisticsDetailScreen(
                 categoryName = selectedCategoryDetails!!,
@@ -139,7 +126,6 @@ fun MainNavigation(
                 onBack = { selectedCategoryDetails = null }
             )
         }
-
         showHome -> {
             if (currentTab == "home") {
                 HomeScreen(
@@ -158,7 +144,6 @@ fun MainNavigation(
                 )
             }
         }
-
         else -> {
             SubscriptionScreen(
                 alreadyAdded = finalizedSubscriptions,
@@ -170,10 +155,7 @@ fun MainNavigation(
                         selectedQueue.clear()
                         selectedQueue.addAll(newOnes)
                         currentIndex = 0
-
-                        // 🔥 Chama o ViewModel para enviar todas de uma vez
                         subscriptionViewModel.addSubscriptionsFromSelection(newOnes)
-
                     } else showHome = true
                 },
                 onSkip = { showHome = true }
