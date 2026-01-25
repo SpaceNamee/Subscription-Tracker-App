@@ -1,6 +1,4 @@
 package com.ims.activesubscriptionsapp.ui.screens.home
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,15 +16,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ims.activesubscriptionsapp.data.models.SubscriptionResponse
 import com.ims.activesubscriptionsapp.ui.components.BottomNavBar
 import com.ims.activesubscriptionsapp.ui.components.SubscriptionRow
-import com.ims.activesubscriptionsapp.ui.screens.subscriptions.SubscriptionViewModel
-import com.ims.activesubscriptionsapp.data.models.SubscriptionResponse
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Locale
-@RequiresApi(Build.VERSION_CODES.O)
+import java.text.SimpleDateFormat
+import java.util.*
 @Composable
 fun HomeScreen(
     subscriptions: List<SubscriptionResponse>,
@@ -35,17 +29,23 @@ fun HomeScreen(
     onNavigateToStats: () -> Unit,
     onSettingsClick: () -> Unit
 ) {
-    //Data
-    val today = LocalDate.now()
-    val dayOfWeek = today
-        .format(DateTimeFormatter.ofPattern("EEEE,", Locale.getDefault()))
-        .replaceFirstChar { it.uppercase() }
-    val fullDate = today.format(DateTimeFormatter.ofPattern("d MMMM", Locale.getDefault()))
-    //Order subscriptions
+    //DATE
+    val dateFormatterDay =
+        SimpleDateFormat("EEEE,", Locale.getDefault())
+    val dateFormatterFull =
+        SimpleDateFormat("d MMMM", Locale.getDefault())
+    val today = Date()
+    val dayOfWeek =
+        dateFormatterDay.format(today).replaceFirstChar { it.uppercase() }
+    val fullDate =
+        dateFormatterFull.format(today)
+    //SORT SUBSCRIPTIONS
     val sortedSubscriptions = remember(subscriptions) {
-        subscriptions.sortedBy { it.nextPaymentDate }
+        subscriptions.sortedBy {
+            it.nextPaymentDate.ifBlank { "9999-12-31" }
+        }
     }
-    //Total
+    //TOTAL
     val total = subscriptions.sumOf { it.amount }
     Column(
         modifier = Modifier
@@ -54,7 +54,7 @@ fun HomeScreen(
             .padding(horizontal = 20.dp)
     ) {
         Spacer(modifier = Modifier.height(40.dp))
-        //Header
+        //HEADER
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -68,7 +68,7 @@ fun HomeScreen(
                 Icon(Icons.Outlined.Settings, null, modifier = Modifier.size(28.dp))
             }
         }
-        //Card Total
+        //TOTAL CARD
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -100,7 +100,7 @@ fun HomeScreen(
                 }
             }
         }
-        //Title + add
+        //TITLE + ADD
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -117,7 +117,7 @@ fun HomeScreen(
                 Text("Add")
             }
         }
-        //List
+        //LIST
         Box(modifier = Modifier.weight(1f)) {
             if (subscriptions.isEmpty()) {
                 Text(
@@ -139,6 +139,7 @@ fun HomeScreen(
                 }
             }
         }
+        //BOTTOM NAV
         BottomNavBar(
             onHomeClick = {},
             onStatsClick = onNavigateToStats

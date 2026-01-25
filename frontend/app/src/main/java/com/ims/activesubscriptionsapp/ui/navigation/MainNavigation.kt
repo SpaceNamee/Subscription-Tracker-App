@@ -1,4 +1,5 @@
 package com.ims.activesubscriptionsapp.ui.navigation
+
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.*
@@ -28,10 +29,9 @@ fun MainNavigation(
     var editingSub by remember { mutableStateOf<SubscriptionResponse?>(null) }
     var selectedCategoryDetails by remember { mutableStateOf<String?>(null) }
     var settingsFlow by remember { mutableStateOf("none") }
-    val userEmail by remember { mutableStateOf("test@gmail.com") }
-
+    val userEmail = "test@gmail.com"
     when {
-        //Configurations and exit
+        //SETTINGS
         settingsFlow != "none" -> {
             SettingsFlowManager(
                 initialEmail = userEmail,
@@ -48,8 +48,8 @@ fun MainNavigation(
                 }
             )
         }
-        //Edit new subscriptions
-        !showHome && currentIndex >= 0 && currentIndex < selectedQueue.size -> {
+        //EDIT NEW SUBSCRIPTIONS
+        !showHome && currentIndex in selectedQueue.indices -> {
             EditSubscriptionDetailScreen(
                 subscription = selectedQueue[currentIndex],
                 onSave = { updated ->
@@ -59,22 +59,23 @@ fun MainNavigation(
                         "Year" -> "yearly"
                         else -> updated.paymentPeriod.lowercase()
                     }
-                    val finalDate = if (updated.nextPaymentDate.isBlank())
-                        "${LocalDate.now()}T12:00:00"
-                    else if (updated.nextPaymentDate.contains("T"))
-                        updated.nextPaymentDate
-                    else
-                        "${updated.nextPaymentDate}T12:00:00"
+                    val finalDate =
+                        if (updated.nextPaymentDate.isBlank())
+                            "${LocalDate.now()}T12:00:00"
+                        else if (updated.nextPaymentDate.contains("T"))
+                            updated.nextPaymentDate
+                        else
+                            "${updated.nextPaymentDate}T12:00:00"
                     val request = CreateSubscriptionRequest(
                         name = updated.name,
-                        amount = if (updated.amount == 0.0) 9.99 else updated.amount,
+                        amount = updated.amount,
                         category = updated.category.lowercase(),
                         payment_period = apiPeriod,
                         first_payment_date = finalDate,
                         currency = updated.currency.ifBlank { "EUR" }
                     )
-                    subscriptionViewModel.addSubscriptionsFromSelection(listOf(updated))
-                    if (currentIndex < selectedQueue.size - 1) {
+                    subscriptionViewModel.addSubscription(updated, request)
+                    if (currentIndex < selectedQueue.lastIndex) {
                         currentIndex++
                     } else {
                         selectedQueue.clear()
@@ -83,7 +84,8 @@ fun MainNavigation(
                     }
                 },
                 onBack = {
-                    if (currentIndex > 0) currentIndex-- else {
+                    if (currentIndex > 0) currentIndex--
+                    else {
                         selectedQueue.clear()
                         currentIndex = -1
                         showHome = true
@@ -97,7 +99,7 @@ fun MainNavigation(
                 }
             )
         }
-        //Edit existant subscriptions
+        //EDIT EXISTING SUBSCRIPTION
         editingSub != null -> {
             EditSubscriptionDetailScreen(
                 subscription = editingSub!!,
@@ -108,8 +110,11 @@ fun MainNavigation(
                         "Year" -> "yearly"
                         else -> updated.paymentPeriod.lowercase()
                     }
-                    val finalDate = if (updated.nextPaymentDate.contains("T"))
-                        updated.nextPaymentDate else "${updated.nextPaymentDate}T12:00:00"
+                    val finalDate =
+                        if (updated.nextPaymentDate.contains("T"))
+                            updated.nextPaymentDate
+                        else
+                            "${updated.nextPaymentDate}T12:00:00"
                     val request = CreateSubscriptionRequest(
                         name = updated.name,
                         amount = updated.amount,
@@ -122,15 +127,15 @@ fun MainNavigation(
                     editingSub = null
                 },
                 onBack = { editingSub = null },
+
                 onDelete = { id ->
                     subscriptionViewModel.deleteSubscription(id)
                     editingSub = null
                     showHome = true
                 }
-
             )
         }
-        //Home
+        //CATEGORY DETAILS
         selectedCategoryDetails != null -> {
             StatisticsDetailScreen(
                 categoryName = selectedCategoryDetails!!,
@@ -138,11 +143,15 @@ fun MainNavigation(
                 onBack = { selectedCategoryDetails = null }
             )
         }
+        //HOME / STATS
         showHome -> {
             if (currentTab == "home") {
                 HomeScreen(
                     subscriptions = finalizedSubscriptions,
-                    onAddMore = { showHome = false; currentIndex = -1 },
+                    onAddMore = {
+                        showHome = false
+                        currentIndex = -1
+                    },
                     onEdit = { editingSub = it },
                     onNavigateToStats = { currentTab = "stats" },
                     onSettingsClick = { settingsFlow = "main" }
@@ -156,19 +165,21 @@ fun MainNavigation(
                 )
             }
         }
+        //SELECT SUBSCRIPTIONS
         else -> {
             SubscriptionScreen(
                 alreadyAdded = finalizedSubscriptions,
-                onNext = { list ->
-                    val newOnes = list.filter { newSub ->
-                        finalizedSubscriptions.none { it.name == newSub.name }
+                onNext = { selected ->
+                    val newOnes = selected.filter { sel ->
+                        finalizedSubscriptions.none { it.name == sel.name }
                     }
                     if (newOnes.isNotEmpty()) {
                         selectedQueue.clear()
                         selectedQueue.addAll(newOnes)
                         currentIndex = 0
-                        subscriptionViewModel.addSubscriptionsFromSelection(newOnes)
-                    } else showHome = true
+                    } else {
+                        showHome = true
+                    }
                 },
                 onSkip = { showHome = true }
             )

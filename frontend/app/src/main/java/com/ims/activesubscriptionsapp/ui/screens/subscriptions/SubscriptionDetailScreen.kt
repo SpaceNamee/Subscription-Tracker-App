@@ -58,8 +58,9 @@ fun EditSubscriptionDetailScreen(
     subscription: SubscriptionResponse,
     onSave: (SubscriptionResponse) -> Unit,
     onBack: () -> Unit,
-    onDelete: (Int) -> Unit // id da subscrição
-) {
+    onDelete: (Int) -> Unit
+)
+{
     var name by remember(subscription) { mutableStateOf(if (subscription.name == "Custom") "" else subscription.name) }
     var amountStr by remember(subscription) { mutableStateOf(if (subscription.amount == 0.0) "" else subscription.amount.toString()) }
     var period by remember(subscription) { mutableStateOf(subscription.paymentPeriod) }
